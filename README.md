@@ -1,13 +1,3 @@
-# template
-
-template repo for plain js/html/css dev (with node &amp; webpack)
-
-Instructions to use this template in GitHub and for cloning:
-
-- select this template when creating a new repo
-- after cloning your new repo with the git clone command, you will not have the gh-pages branch, only the main
-- to get the gh-pages branch cloned as well, list the remote branches from your local repo `git branch -r`
-- then run `git checkout -b gh-pages origin/gh-pages`
 
 Instructions for running the build (dev mode and prod mode):
 

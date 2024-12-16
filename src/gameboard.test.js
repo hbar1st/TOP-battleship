@@ -6,7 +6,7 @@ describe("Gameboard Test", () => {
   const patrolBoat = new Ship(2, "Patrol Boat");
   const patrolBoat1 = new Ship(2, "Patrol Boat 1");
   const patrolBoat2 = new Ship(2, "Patrol Boat 2");
-
+  const destroyer = new Ship(3, "Destroyer");
   const carrier = new Ship(5, "Carrier");
   const carrier1 = new Ship(5, "Carrier 1");
   const carrier2 = new Ship(5, "Carrier 2");
@@ -86,5 +86,45 @@ describe("Gameboard Test", () => {
     expect(gameboard.placeShip(battleship, 7, 0, Gameboard.horizontal)).toBe(
       false
     );
+  });
+
+  test("Gameboard Registers Hit on Battleship", () => {
+    const shipPlaced = gameboard.placeShip(
+      battleship,
+      6,
+      6,
+      Gameboard.vertical
+    );
+    expect(shipPlaced).toBe(true);
+    expect(gameboard.receiveAttack(6, 6)).toBe(true); //true means hit
+    expect(battleship.isSunk()).toBe(false);
+  });
+
+  test("Gameboard Registers Miss on Battleship", () => {
+    const expectedMisses = [{ x: 5, y: 6 }];
+    expect(gameboard.receiveAttack(5, 6)).toBe(false); //false means miss
+    expect(gameboard.misses).toEqual(expect.arrayContaining(expectedMisses));
+  });
+
+  test("Gameboard Registers That Patrol Boat Has Sunk After 2 Hits", () => {
+    expect(gameboard.receiveAttack(6, 7)).toBe(true); //true means hit
+    expect(gameboard.receiveAttack(6, 8)).toBe(true); //true means hit
+    expect(battleship.isSunk()).toBe(false);
+    expect(gameboard.receiveAttack(6, 9)).toBe(true); //true means hit
+    expect(battleship.isSunk()).toBe(true);
+  });
+
+  test("Gameboard Knows If All Ships Sank", () => {
+    const gameboard = new Gameboard(10, "Player");
+    gameboard.placeShip(patrolBoat, 0, 0, Gameboard.horizontal); // (0,0), (1,0)
+    gameboard.placeShip(destroyer, 2, 0, Gameboard.horizontal); // (2,0), (3, 0), (4,0)
+    gameboard.receiveAttack(0, 0);
+    gameboard.receiveAttack(1, 0);
+    expect(gameboard.allShipsSunk()).toBe(false);
+    gameboard.receiveAttack(2, 0);
+    gameboard.receiveAttack(3, 0);
+    gameboard.receiveAttack(4, 0);
+
+    expect(gameboard.allShipsSunk()).toBe(true);
   });
 });

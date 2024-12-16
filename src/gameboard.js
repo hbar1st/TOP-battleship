@@ -1,7 +1,7 @@
 export class Gameboard {
   #size;
   #name;
-  #misses = new Map();
+  #misses = [];
   #ships = [];
   static horizontal = "hor";
   static vertical = "ver";
@@ -15,6 +15,48 @@ export class Gameboard {
     return this.#name;
   }
 
+  get misses() {
+    return this.#misses;
+  }
+
+  addMiss(x, y) {
+    this.#misses.push({ x, y });
+  }
+
+  receiveAttack(x, y) {
+    //is (x,y) a hit?, which ship was hit?
+    let hit = false;
+    let shipIndex = 0;
+    do {
+      let currShip = this.#ships[shipIndex];
+      let i = 0;
+      do {
+        if (
+          (currShip.dir === "hor" &&
+            currShip.x1 + i === x &&
+            currShip.y1 === y) ||
+          (currShip.dir === "ver" && currShip.x1 === x && currShip.y1 + i === y)
+        ) {
+          hit = true;
+          currShip.ship.hit();
+        } else {
+          i++;
+        }
+      } while (!hit && currShip.ship.length > i);
+      shipIndex++;
+    } while (!hit && this.#ships.length > shipIndex);
+    if (!hit) {
+      //it's a miss
+      this.addMiss(x, y);
+    }
+    return hit;
+  }
+
+  allShipsSunk() {
+    return this.#ships.reduce((el, acc) => {
+
+    }, true);
+  }
   placeShip(ship, x1, y1, dir = "hor") {
     // check if this ship was placed on the board earlier
     const otherShips = this.#ships.filter((s) => s.ship !== ship);

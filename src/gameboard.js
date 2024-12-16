@@ -19,6 +19,37 @@ export class Gameboard {
     return this.#misses;
   }
 
+  get boardArray() {
+    // Note: (0,0) is the lower-left corner of the grid like a normal cartesian plane
+    // creates a 2d array representing the board with
+    // cells marked as m for misses
+    // cells marked with ship names being occupied by that ship
+    // cells marked as o are open
+    const board = [];
+
+    for (let i = 0; i < this.#size; i++) {
+      const row = [];
+      for (let j = 0; j < this.#size; j++) {
+        row.push("o");
+      }
+      board.push(row);
+    }
+
+    this.misses.forEach((miss) => (board[miss.y][miss.x] = "m"));
+    this.#ships.forEach((shipSpot) => {
+      for (let i = 0; i < shipSpot.ship.length; i++) {
+        shipSpot.dir === "hor"
+          ? (board[shipSpot.y1][shipSpot.x1 + i] = shipSpot.ship.name)
+          : (board[shipSpot.y1 + i][shipSpot.x1] = shipSpot.ship.name);
+      }
+    });
+    let mirrorboard = [];
+    for (let i = board.length - 1; i >= 0; i--) {
+      mirrorboard.push(board[i]);
+    }
+    return mirrorboard;
+  }
+
   addMiss(x, y) {
     this.#misses.push({ x, y });
   }
@@ -57,6 +88,7 @@ export class Gameboard {
       return acc && el.ship.isSunk();
     }, true);
   }
+
   placeShip(ship, x1, y1, dir = "hor") {
     // check if this ship was placed on the board earlier
     const otherShips = this.#ships.filter((s) => s.ship !== ship);

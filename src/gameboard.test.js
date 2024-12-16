@@ -124,7 +124,38 @@ describe("Gameboard Test", () => {
     gameboard.receiveAttack(2, 0);
     gameboard.receiveAttack(3, 0);
     gameboard.receiveAttack(4, 0);
-
     expect(gameboard.allShipsSunk()).toBe(true);
+  });
+
+  test("Gameboard Array Displays As Open At Start", () => {
+    const gameboard = new Gameboard(5, "Player");
+    const expected = [
+      ["o", "o", "o", "o", "o"],
+      ["o", "o", "o", "o", "o"],
+      ["o", "o", "o", "o", "o"],
+      ["o", "o", "o", "o", "o"],
+      ["o", "o", "o", "o", "o"],
+    ];
+    expect(gameboard.boardArray).toEqual(expect.arrayContaining(expected));
+  });
+
+  test("Gameboard Array Displays Misses", () => {
+    const gameboard = new Gameboard(5, "Player");
+
+    gameboard.placeShip(patrolBoat, 0, 1, Gameboard.horizontal); // (0,1), (1,1)
+    const expected = [
+      ["o", "o", "o", "o", "m"],
+      ["m", "o", "o", "o", "o"],
+      ["o", "o", "m", "o", "o"],
+      ["Patrol Boat", "Patrol Boat", "o", "o", "o"],
+      ["m", "o", "o", "o", "o"],
+    ];
+
+    gameboard.receiveAttack(0, 0);
+    gameboard.receiveAttack(2, 2);
+    gameboard.receiveAttack(4, 4);
+
+    gameboard.receiveAttack(0, 3);
+    expect(gameboard.boardArray).toEqual(expect.arrayContaining(expected));
   });
 });

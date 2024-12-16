@@ -1,5 +1,158 @@
+@font-face {
+  font-family: "macondo_swash_capsregular";
+  src: url("macondoswashcaps-regular-webfont.woff2") format("woff2"),
+    url("macondoswashcaps-regular-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  font-family: "macondo_swash_capsregular", serif;
+  background-color: #eee;
+  background-image: linear-gradient(
+      0deg,
+      #00bcd4 25%,
+      transparent 25%,
+      transparent 45%,
+      #00bcd4 45%,
+      #00bcd4
+    ),
+    linear-gradient(
+      90deg,
+      #10aae5 25%,
+      transparent 25%,
+      transparent 45%,
+      #10aae5 45%,
+      #00bcd4
+    );
+  background-size: 50px 50px;
+  background-position: 0 0, 50px 50px;
+  color: white;
+
+  main {
+    margin-top: 5vh;
+  }
+}
+
+#circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 30px;
+  width: clamp(300px, 550px, min(95vh, 95vw));
+  height: clamp(300px, 550px, min(95vw, 95vh));
+  aspect-ratio: 1;
+  min-width: 150px;
+
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0.25turn at 50% 50%,
+    #f69d3ce6,
+    10deg,
+    #0a762cab,
+    350deg,
+    #d4ffb3d4
+  );
+
+  header {
+    margin-top: calc(calc(min(100vh, 100vw) - 100%) / 2 - 18%);
+  }
+
+  form {
+    max-width: 85%;
+  }
+}
+
+h1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(14px, 4vw, 3.5rem);
+}
+h1 > em {
+  font-size: clamp(18px, 6vw, 4.5rem);
+  letter-spacing: 1px;
+  font-kerning: normal;
+}
+
+fieldset {
+  padding: 15px;
+  gap: 15px;
+  font-size: clamp(14px, 3vw, 1.8rem);
+  display: flex;
+  flex-direction: column;
+
+  text-align: center;
+
+  legend {
+    font-size: clamp(12px, 1.2rem, 5vw);
+  }
+  label {
+    display: flex;
+    align-items: center;
+  }
+  input {
+    margin: 5px;
+    max-width: 150px;
+  }
+  input[type="radio"] {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border: 2px solid #0d2d4b;
+    transform: skew(45deg, 313deg);
+    transition: 0.2s all linear;
+    margin-right: 1rem;
+  }
+  input::placeholder {
+    font-weight: lighter;
+    opacity: 0.5;
+  }
+
+  input:checked {
+    border: 4px solid rgb(135, 225, 135);
+  }
+
+  #another-human:checked ~ #opp-name {
+    border: 3px solid rgb(135, 225, 135);
+    transition: 0.2s all linear;
+  }
+  #another-human:not(:checked) ~ #opp-name {
+    transform: scale(1, 0);
+  }
+  #opp-name {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-radius: 5px;
+  }
+
+  button {
+    font-size: clamp(14px, 1.3rem, 2vw);
+    padding: 10px 0px;
+    border-radius: 5px;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 600;
+    font-variant-ligatures: none;
+  }
+
+  button:hover,
+  input:hover {
+    background-color: azure;
+  }
+  label:hover {
+    text-shadow: 1px 0px whitesmoke;
+  }
 }

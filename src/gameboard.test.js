@@ -71,19 +71,19 @@ describe("Gameboard Test", () => {
   });
 
   test("Gameboard Place Battleship in Empty Spot, Vertically", () => {
-    expect(gameboard.placeShip(patrolBoat, 2, 3, Gameboard.vertical)).toBe(
+    expect(gameboard.placeShip(battleship, 2, 3, Gameboard.vertical)).toBe(
       true
     );
   });
 
   test("Gameboard Place Battleship in Disallowed Spot, Vertically", () => {
-    expect(gameboard.placeShip(patrolBoat1, 0, 7, Gameboard.vertical)).toBe(
+    expect(gameboard.placeShip(battleship, 0, 7, Gameboard.vertical)).toBe(
       false
     );
   });
 
   test("Gameboard Place Battleship in Disallowed Spot, Horizontally", () => {
-    expect(gameboard.placeShip(patrolBoat2, 7, 0, Gameboard.vertical)).toBe(
+    expect(gameboard.placeShip(battleship, 7, 0, Gameboard.horizontal)).toBe(
       false
     );
   });

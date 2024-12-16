@@ -31,9 +31,19 @@ export class Gameboard {
   getIndicatedSpots(x1, y1, length, dir) {
     const positions = [];
     for (let i = 0; i < length; i++) {
-      dir === "hor"
-        ? positions.push({ x: x1 + i, y: y1 })
-        : positions.push({ x: x1, y: y1 + i });
+      if (dir === "hor") {
+        const x2 = x1 + i;
+        if (x2 === this.#size) {
+          return null; //out of bounds
+        }
+        positions.push({ x: x2, y: y1 });
+      } else {
+        const y2 = y1 + i;
+        if (y2 === this.#size) {
+          return null; //out of bounds
+        }
+        positions.push({ x: x1, y: y2 });
+      }
     }
     return positions;
   }
@@ -53,7 +63,9 @@ export class Gameboard {
   boardFree(x1, y1, length, dir) {
     // compile list of positions to check are free
     const positions = this.getIndicatedSpots(x1, y1, length, dir);
-
+    if (positions === null) {
+      return false;
+    }
     // iterate over list of ships and compile occupied positions
     const shipPositions = this.getAllShipSpots();
 

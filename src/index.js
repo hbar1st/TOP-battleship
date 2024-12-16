@@ -5,7 +5,16 @@ import { Ship } from "./ship.js";
 
 const gameboard = new Gameboard(10, "Player");
 const patrolBoat = new Ship(2, "Patrol Boat");
-const patrolBoat2 = new Ship(2, "Patrol Boat 2");
 
-console.log(gameboard.placeShip(patrolBoat, 0, 0, Gameboard.vertical));
-console.log(gameboard.placeShip(patrolBoat2, 0, 1, Gameboard.vertical));
+const destroyer = new Ship(3, "Destroyer");
+
+gameboard.placeShip(patrolBoat, 0, 0, Gameboard.horizontal); // (0,0), (1,0)
+gameboard.placeShip(destroyer, 2, 0, Gameboard.horizontal); // (2,0), (3, 0), (4,0)
+gameboard.receiveAttack(0, 0);
+gameboard.receiveAttack(1, 0);
+gameboard.allShipsSunk();
+gameboard.receiveAttack(2, 0);
+gameboard.receiveAttack(3, 0);
+gameboard.receiveAttack(4, 0);
+
+gameboard.allShipsSunk();

@@ -53,8 +53,8 @@ export class Gameboard {
   }
 
   allShipsSunk() {
-    return this.#ships.reduce((el, acc) => {
-
+    return this.#ships.reduce((acc, el) => {
+      return acc && el.ship.isSunk();
     }, true);
   }
   placeShip(ship, x1, y1, dir = "hor") {

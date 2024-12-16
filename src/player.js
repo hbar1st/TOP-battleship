@@ -1,12 +1,12 @@
 import { Gameboard } from "./gameboard.js";
 import { Ship } from "./ship.js";
 
-export function createHumanPlayer() {
-  return createPlayer("human");
+export function createHumanPlayer(pname) {
+  return createPlayer("human", pname);
 }
 
 export function createComputerPlayer() {
-  return createPlayer("computer");
+  return createPlayer("computer", "Computer");
 }
 
 /**
@@ -14,7 +14,7 @@ export function createComputerPlayer() {
  * @param {*} type can be human or computer
  * @returns object
  */
-function createPlayer(type) {
+function createPlayer(type, pname) {
   const carrier = new Ship(5, "Carrier");
   const battleship = new Ship(4, "Battle Ship");
   const destroyer = new Ship(3, "Destroyer");
@@ -22,6 +22,7 @@ function createPlayer(type) {
   const patrolBoat = new Ship(2, "Patrol Boat");
 
   const board = new Gameboard(type);
+  const name = pname;
 
   // initially we are hardcoding the locations of the ships
   board.placeShip(patrolBoat, 0, 0, Gameboard.horizontal); // (0,0), (1,0)
@@ -34,5 +35,8 @@ function createPlayer(type) {
     return board;
   };
 
-  return { getBoard };
+  const getName = () => {
+    return name;
+  };
+  return { getBoard, getName };
 }

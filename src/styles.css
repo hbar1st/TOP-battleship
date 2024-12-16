@@ -66,11 +66,24 @@ body {
   );
 
   header {
-    margin-top: calc(calc(min(100vh, 100vw) - 100%) / 2 - 18%);
+    margin-top: calc(calc(min(100vh, 100vw) - 100%) / 2 - 25%);
   }
 
   form {
     max-width: 85%;
+
+    font-size: clamp(14px, 3vw, 1.8rem);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    & > label:last-of-type {
+      input {
+        font-size: clamp(14px, 3vw, 1.8rem);
+        padding: 3px;
+
+        margin-left: 1rem;
+      }
+    }
   }
 }
 
@@ -103,6 +116,7 @@ fieldset {
     display: flex;
     align-items: center;
   }
+
   input {
     margin: 5px;
     max-width: 150px;
@@ -111,7 +125,7 @@ fieldset {
     appearance: none;
     width: 10px;
     height: 10px;
-    border: 2px solid #0d2d4b;
+    border: 2px solid rgb(47, 79, 47);
     transform: skew(45deg, 313deg);
     transition: 0.2s all linear;
     margin-right: 1rem;
@@ -138,21 +152,21 @@ fieldset {
     font-weight: 600;
     border-radius: 5px;
   }
-
-  button {
-    font-size: clamp(14px, 1.3rem, 2vw);
-    padding: 10px 0px;
-    border-radius: 5px;
-    font-family: "Courier New", Courier, monospace;
-    font-weight: 600;
-    font-variant-ligatures: none;
-  }
-
-  button:hover,
-  input:hover {
-    background-color: azure;
-  }
   label:hover {
     text-shadow: 1px 0px whitesmoke;
   }
+}
+
+button {
+  font-size: clamp(14px, 1.3rem, 2vw);
+  padding: 10px 0px;
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 600;
+  font-variant-ligatures: none;
+}
+
+button:hover,
+input:hover {
+  background-color: azure;
 }

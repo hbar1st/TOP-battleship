@@ -2,7 +2,7 @@ import { Gameboard } from "./gameboard.js";
 import { Ship } from "./ship.js";
 
 describe("Gameboard Test", () => {
-  const gameboard = new Gameboard(10, "Player");
+  const gameboard = new Gameboard("Player");
   const patrolBoat = new Ship(2, "Patrol Boat");
   const patrolBoat1 = new Ship(2, "Patrol Boat 1");
   const patrolBoat2 = new Ship(2, "Patrol Boat 2");
@@ -115,7 +115,7 @@ describe("Gameboard Test", () => {
   });
 
   test("Gameboard Knows If All Ships Sank", () => {
-    const gameboard = new Gameboard(10, "Player");
+    const gameboard = new Gameboard("Player");
     gameboard.placeShip(patrolBoat, 0, 0, Gameboard.horizontal); // (0,0), (1,0)
     gameboard.placeShip(destroyer, 2, 0, Gameboard.horizontal); // (2,0), (3, 0), (4,0)
     gameboard.receiveAttack(0, 0);
@@ -128,7 +128,7 @@ describe("Gameboard Test", () => {
   });
 
   test("Gameboard Array Displays As Open At Start", () => {
-    const gameboard = new Gameboard(5, "Player");
+    const gameboard = new Gameboard("Player", 5);
     const expected = [
       ["o", "o", "o", "o", "o"],
       ["o", "o", "o", "o", "o"],
@@ -136,11 +136,11 @@ describe("Gameboard Test", () => {
       ["o", "o", "o", "o", "o"],
       ["o", "o", "o", "o", "o"],
     ];
-    expect(gameboard.boardArray).toEqual(expect.arrayContaining(expected));
+    expect(gameboard.getBoardArray()).toEqual(expect.arrayContaining(expected));
   });
 
-  test("Gameboard Array Displays Misses", () => {
-    const gameboard = new Gameboard(5, "Player");
+  test("Gameboard Array Displays Misses and Ships", () => {
+    const gameboard = new Gameboard("Player", 5);
 
     gameboard.placeShip(patrolBoat, 0, 1, Gameboard.horizontal); // (0,1), (1,1)
     const expected = [
@@ -156,6 +156,29 @@ describe("Gameboard Test", () => {
     gameboard.receiveAttack(4, 4);
 
     gameboard.receiveAttack(0, 3);
-    expect(gameboard.boardArray).toEqual(expect.arrayContaining(expected));
+    expect(gameboard.getBoardArray()).toEqual(expect.arrayContaining(expected));
+  });
+
+  test("Gameboard Array Displays Misses and Hits (Not Ships)", () => {
+    const gameboard = new Gameboard("Player", 5);
+
+    gameboard.placeShip(carrier, 0, 1, Gameboard.horizontal); // (0,1), (1,1), (2, 1), (3, 1), (4, 1)
+    const expected = [
+      ["o", "o", "o", "o", "m"],
+      ["m", "o", "o", "o", "o"],
+      ["o", "o", "m", "o", "o"],
+      ["x", "o", "x", "o", "o"],
+      ["m", "o", "o", "o", "o"],
+    ];
+
+    gameboard.receiveAttack(0, 0); //miss
+    gameboard.receiveAttack(0, 1); //hit
+    gameboard.receiveAttack(2, 1); //hit
+    gameboard.receiveAttack(2, 2); //miss
+    gameboard.receiveAttack(4, 4); //miss
+    gameboard.receiveAttack(0, 3); //miss
+    expect(gameboard.getBoardArray(true)).toEqual(
+      expect.arrayContaining(expected)
+    );
   });
 });

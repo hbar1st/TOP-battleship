@@ -2,11 +2,12 @@ export class Gameboard {
   #size;
   #name;
   #misses = [];
+  #hits = [];
   #ships = [];
   static horizontal = "hor";
   static vertical = "ver";
 
-  constructor(size, name) {
+  constructor(name, size = 10) {
     this.#size = size;
     this.#name = name;
   }
@@ -19,11 +20,17 @@ export class Gameboard {
     return this.#misses;
   }
 
-  get boardArray() {
+  get hits() {
+    return this.#hits;
+  }
+  
+  getBoardArray(obfuscate = false) {
+    //if obfuscate is true, the ships are not shown, only the hits if any are shown
     // Note: (0,0) is the lower-left corner of the grid like a normal cartesian plane
     // creates a 2d array representing the board with
     // cells marked as m for misses
-    // cells marked with ship names being occupied by that ship
+    // cells marked with ship names being occupied by that ship if obfuscate is false, otherwise they don't show
+    // cells marked with x are hits if obfuscate is true
     // cells marked as o are open
     const board = [];
 
@@ -36,13 +43,17 @@ export class Gameboard {
     }
 
     this.misses.forEach((miss) => (board[miss.y][miss.x] = "m"));
-    this.#ships.forEach((shipSpot) => {
-      for (let i = 0; i < shipSpot.ship.length; i++) {
-        shipSpot.dir === "hor"
-          ? (board[shipSpot.y1][shipSpot.x1 + i] = shipSpot.ship.name)
-          : (board[shipSpot.y1 + i][shipSpot.x1] = shipSpot.ship.name);
-      }
-    });
+    if (obfuscate) {
+      this.#hits.forEach((hit) => (board[hit.y][hit.x] = "x"));
+    } else {
+      this.#ships.forEach((shipSpot) => {
+        for (let i = 0; i < shipSpot.ship.length; i++) {
+          shipSpot.dir === "hor"
+            ? (board[shipSpot.y1][shipSpot.x1 + i] = shipSpot.ship.name)
+            : (board[shipSpot.y1 + i][shipSpot.x1] = shipSpot.ship.name);
+        }
+      });
+    }
     let mirrorboard = [];
     for (let i = board.length - 1; i >= 0; i--) {
       mirrorboard.push(board[i]);
@@ -50,8 +61,12 @@ export class Gameboard {
     return mirrorboard;
   }
 
-  addMiss(x, y) {
+  #addMiss(x, y) {
     this.#misses.push({ x, y });
+  }
+
+  #addHit(x, y) {
+    this.#hits.push({ x, y });
   }
 
   receiveAttack(x, y) {
@@ -76,10 +91,9 @@ export class Gameboard {
       } while (!hit && currShip.ship.length > i);
       shipIndex++;
     } while (!hit && this.#ships.length > shipIndex);
-    if (!hit) {
-      //it's a miss
-      this.addMiss(x, y);
-    }
+
+    //record a list of hits and misses
+    hit ? this.#addHit(x, y) : this.#addMiss(x, y);
     return hit;
   }
 

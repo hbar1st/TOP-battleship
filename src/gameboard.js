@@ -12,6 +12,10 @@ export class Gameboard {
     this.#name = name;
   }
 
+  get ships() {
+    return this.#ships;
+  }
+
   get name() {
     return this.#name;
   }
@@ -23,7 +27,11 @@ export class Gameboard {
   get hits() {
     return this.#hits;
   }
-  
+
+  get size() {
+    return this.#size;
+  }
+
   getBoardArray(obfuscate = false) {
     //if obfuscate is true, the ships are not shown, only the hits if any are shown
     // Note: (0,0) is the lower-left corner of the grid like a normal cartesian plane

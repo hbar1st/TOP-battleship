@@ -26,6 +26,7 @@ opponentName.addEventListener("input", () => {
 const submitBtn = document.querySelector("button");
 submitBtn.addEventListener("click", (event) => {
   event.preventDefault();
+  let opponentPlayer;
   //validate the form before commencing the game
   let valid = true;
   if (mainPlayerName.value === "") {
@@ -41,6 +42,7 @@ submitBtn.addEventListener("click", (event) => {
   opponentChoices.forEach((el) => (el.checked ? (checkedId = el.id) : false));
   console.log(checkedId);
   if (checkedId === "the-computer") {
+    opponentPlayer = createComputerPlayer();
   } else {
     //check name given
     const opponentName = document.querySelector("#opp-name");
@@ -50,10 +52,44 @@ submitBtn.addEventListener("click", (event) => {
       valid = false;
     } else {
       opponentName.setCustomValidity("");
+      opponentPlayer = createHumanPlayer(opponentName.value);
     }
   }
   if (valid) {
     //commence the game
-    landingDialog.close();
+    const mainPlayer = createHumanPlayer(mainPlayerName.value); //always the human is the main player
+    const mainPlayerGridTitle = document.querySelector("#main-player-grid>h1");
+    mainPlayerGridTitle.innerText = `${mainPlayer.getName()}'s board`;
+    const gridEl = document.querySelector("#main-player-grid>#grid");
+    formNewGrid(gridEl, mainPlayer.getBoard());
+    landingDialog.style.display = "none";
+    const mainPlayerGrid = document.querySelector("#main-player-grid");
+
+    mainPlayerGrid.style.display = "inline-block";
   }
 });
+
+function formNewGrid(gridEl, gameboard) {
+  const ships = gameboard.ships;
+  
+  let gridArr = []; // a grid array of divs
+
+  const div = document.createElement("div");
+  div.classList.add("cell");
+  for (let i = 0; i < gameboard.size; i++) {
+    const row = [];
+    for (let j = 0; j < gameboard.size; j++) {
+      row.push(div.cloneNode());
+    }
+    gridArr.push(row);
+  }
+
+  ships.forEach((shipSpot) => {
+    for (let i = 0; i < shipSpot.ship.length; i++) {
+      shipSpot.dir === "hor"
+        ? (gridArr[shipSpot.y1][shipSpot.x1 + i].classList.add(shipSpot.ship.name))
+        : (gridArr[shipSpot.y1 + i][shipSpot.x1].classList.add(shipSpot.ship.name));
+    }
+  });
+
+}

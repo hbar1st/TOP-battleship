@@ -16,12 +16,23 @@ describe("Gameboard Test", () => {
   test("Gameboard Object Created", () => {
     expect(gameboard).toBeInstanceOf(Gameboard);
     expect(gameboard.name).toBe("Player");
+    expect(gameboard.size).toBe(10);
   });
 
   test("Gameboard Place Patrol Ship in Empty Spot, Horizontally", () => {
     expect(gameboard.placeShip(patrolBoat, 0, 0, Gameboard.horizontal)).toBe(
       true
     );
+  });
+
+  test("Gameboard Returns Ship List From Ships Property", () => {
+    expect(gameboard.ships.length).toBe(1);
+    expect(gameboard.ships[0]).toEqual({
+      dir: "hor",
+      ship: patrolBoat,
+      x1: 0,
+      y1: 0,
+    });
   });
 
   test("Gameboard Place Patrol Ship in Fully Occupied Spot, Horizontally", () => {

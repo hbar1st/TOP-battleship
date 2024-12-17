@@ -1,7 +1,7 @@
-import { Ship } from "./ship.js";
+import { PatrolBoat, Ship } from "./ship.js";
 
-describe("Ship Test", () => {
-  const patrolBoat = new Ship(2, "Patrol Boat");
+describe("Patrol Boat Test", () => {
+  const patrolBoat = new PatrolBoat();
 
   test("Ship Object Created", () => {
     expect(patrolBoat).toBeInstanceOf(Ship);
@@ -10,6 +10,7 @@ describe("Ship Test", () => {
   test("Ship Getters", () => {
     expect(patrolBoat.length).toBe(2);
     expect(patrolBoat.name).toBe("Patrol Boat");
+    expect(patrolBoat.id).toBe("patrol-boat");
   });
 
   test("Ship Sunk Checks", () => {

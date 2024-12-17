@@ -1,5 +1,12 @@
 import { Gameboard } from "./gameboard.js";
-import { Ship } from "./ship.js";
+import {
+  Ship,
+  PatrolBoat,
+  Destroyer,
+  Submarine,
+  Battleship,
+  Carrier,
+} from "./ship.js";
 
 export function createHumanPlayer(pname) {
   return createPlayer("human", pname);
@@ -15,10 +22,10 @@ export function createComputerPlayer() {
  * @returns object
  */
 function createPlayer(type, pname) {
-  const carrier = new Ship(5, "Carrier");
-  const battleship = new Ship(4, "Battle Ship");
-  const destroyer = new Ship(3, "Destroyer");
-  const submarine = new Ship(3, "Submarine");
+  const carrier = new Carrier();
+  const battleship = new Battleship();
+  const destroyer = new Destroyer();
+  const submarine = new Submarine();
   const patrolBoat = new Ship(2, "Patrol Boat");
 
   const board = new Gameboard(type);

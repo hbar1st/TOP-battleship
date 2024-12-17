@@ -6,7 +6,7 @@
   font-style: normal;
 }
 
-* {
+*:not(dialog) {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
@@ -44,6 +44,28 @@ body {
   }
 }
 
+#circle::before {
+  content: "";
+
+  width: clamp(250px, 450px, min(85vh, 85vw));
+  height: clamp(250px, 450px, min(85vw, 85vh));
+
+  aspect-ratio: 1;
+  min-width: 150px;
+
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    #d4ffb382 0%,
+    #d4ffb382 0.7%,
+    transparent 0.7%,
+    transparent 17.5%
+  );
+  background-position: 0px, 0px;
+  position: absolute;
+
+  top: calc(50px + 5vh);
+}
 #circle {
   display: flex;
   flex-direction: column;
@@ -70,8 +92,8 @@ body {
   }
 
   form {
+    z-index: 2;
     max-width: 85%;
-
     font-size: clamp(14px, 3vw, 1.8rem);
     display: flex;
     flex-direction: column;
@@ -99,7 +121,11 @@ h1 > em {
   letter-spacing: 1px;
   font-kerning: normal;
 }
-
+dialog {
+  background: transparent;
+  color: white;
+  border: none;
+}
 fieldset {
   padding: 15px;
   gap: 15px;
@@ -125,7 +151,7 @@ fieldset {
     appearance: none;
     width: 10px;
     height: 10px;
-    border: 2px solid rgb(47, 79, 47);
+    border: 3px solid rgb(47, 79, 47);
     transform: skew(45deg, 313deg);
     transition: 0.2s all linear;
     margin-right: 1rem;
@@ -134,7 +160,9 @@ fieldset {
     font-weight: lighter;
     opacity: 0.5;
   }
-
+  input[type="text"]:invalid {
+    border: 2px solid red;
+  }
   input:checked {
     border: 4px solid rgb(135, 225, 135);
   }

@@ -7,49 +7,50 @@
   </head>
   <body>
     <main>
-      <div id="circle">
-        <header>
-          <h1>It's time to play <em>BATTLESHIP!</em></h1>
-        </header>
-        <form action="" method="post">
-          <fieldset>
-            <legend><h2>Who do you want to play against?</h2></legend>
-            <label for="another-human"
-              ><input
-                type="radio"
-                name="opponent"
-                required
-                id="another-human"
-              />Another human:
-              <input
-                type="text"
-                name="opponent-name"
-                id="opp-name"
-                placeholder="type name"
-              />
-            </label>
-            <label
-              ><input
-                type="radio"
-                name="opponent"
-                required
-                checked
-                id="the-computer"
-              />The Computer.</label
-            >
+      <dialog open id="landing-dialog">
+        <div id="circle">
+          <header>
+            <h1>It's time to play <em>BATTLESHIP!</em></h1>
+          </header>
+          <form action="" method="post">
+            <fieldset>
+              <legend><h2>Who do you want to play against?</h2></legend>
+              <label for="another-human"
+                ><input
+                  type="radio"
+                  name="opponent"
+                  required
+                  id="another-human"
+                />Another human:
+                <input
+                  type="text"
+                  name="opponent-name"
+                  id="opp-name"
+                  placeholder="type name"
+                />
+              </label>
+              <label
+                ><input
+                  type="radio"
+                  name="opponent"
+                  required
+                  checked
+                  id="the-computer"
+                />The Computer.</label
+              >
+            </fieldset>
 
-          </fieldset>
-          
-          <label
-          >Your name:<input
-            type="text"
-            required
-            id="main-player"
-            placeholder="type your name"
-        /></label>
-        <button type="submit">Let's Play!</button>
-        </form>
-      </div>
+            <label
+              >Your name:<input
+                type="text"
+                required
+                id="main-player"
+                placeholder="type your name"
+            /></label>
+            <button formmethod="dialog" type="submit">Let's Play!</button>
+          </form>
+        </div>
+      </dialog>
     </main>
   </body>
 </html>

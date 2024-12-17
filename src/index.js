@@ -71,25 +71,73 @@ submitBtn.addEventListener("click", (event) => {
 
 function formNewGrid(gridEl, gameboard) {
   const ships = gameboard.ships;
-  
+
   let gridArr = []; // a grid array of divs
 
-  const div = document.createElement("div");
-  div.classList.add("cell");
   for (let i = 0; i < gameboard.size; i++) {
     const row = [];
     for (let j = 0; j < gameboard.size; j++) {
-      row.push(div.cloneNode());
+      const div = document.createElement("div");
+      div.classList.add("cell");
+      row.push(div);
     }
     gridArr.push(row);
   }
 
   ships.forEach((shipSpot) => {
+    /*
     for (let i = 0; i < shipSpot.ship.length; i++) {
-      shipSpot.dir === "hor"
-        ? (gridArr[shipSpot.y1][shipSpot.x1 + i].classList.add(shipSpot.ship.name))
-        : (gridArr[shipSpot.y1 + i][shipSpot.x1].classList.add(shipSpot.ship.name));
+      if (shipSpot.dir === "hor") {
+        gridArr[shipSpot.y1][shipSpot.x1 + i].classList.add(
+          shipSpot.ship.id,
+          "vmargin"
+        );
+
+        if (i == 0) {
+          gridArr[shipSpot.y1][shipSpot.x1].classList.add("tip");
+        }
+      } else {
+        gridArr[shipSpot.y1 + i][shipSpot.x1].classList.add(
+          shipSpot.ship.id,
+          "hmargin"
+        );
+        if (i == 0) {
+          gridArr[shipSpot.y1][shipSpot.x1].classList.add("vtip");
+        }
+      }
+    }*/
+
+    const div = document.createElement("div");
+    div.classList.add("ship", shipSpot.ship.id);
+    if (shipSpot.dir === "hor") {
+      // (3,2), (3, 3), (3,4) (3, 5) (3,6) row
+      div.style.gridColumn = `${shipSpot.x1 + 1} / span ${
+        shipSpot.ship.length
+      }`;
+      div.style.gridRow = gameboard.size - shipSpot.y1;
+      div.classList.add("vmargin");
+    } else {
+      div.style.gridRow = `${
+        gameboard.size - shipSpot.ship.length - shipSpot.y1 + 1
+      } / span ${shipSpot.ship.length}`;
+      div.style.gridColumn = 1 + shipSpot.x1;
+      div.classList.add("hmargin");
     }
+    gridEl.appendChild(div);
   });
 
+  let mirrorboard = [];
+  for (let i = gameboard.size - 1; i >= 0; i--) {
+    mirrorboard.push(gridArr[i]);
+  }
+
+  for (let i = 0; i < gameboard.size; i++) {
+    for (let j = 0; j < gameboard.size; j++) {
+      mirrorboard[i][j].style.gridRow = i + 1;
+      mirrorboard[i][j].style.gridColumn = j + 1;
+      gridEl.appendChild(mirrorboard[i][j]);
+    }
+  }
+
+  console.log(gameboard.getBoardArray());
 }

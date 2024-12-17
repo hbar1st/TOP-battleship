@@ -75,6 +75,7 @@ top: calc(50px + 1vh);*/
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 15px;
   padding: 30px;
   width: clamp(300px, 550px, min(95vh, 95vw));
@@ -200,6 +201,8 @@ button {
   font-family: "Courier New", Courier, monospace;
   font-weight: 600;
   font-variant-ligatures: none;
+  width: 70%;
+  align-self: center;
 }
 
 button:hover,
@@ -224,4 +227,43 @@ div#grid {
 
 div.cell {
   border: 2px outset black;
+}
+.hmargin {
+  margin: 2px 3px;
+}
+.vmargin {
+  margin: 3px 2px;
+}
+.ship {
+  border-radius: 55%;
+  z-index: 3;
+}
+.destroyer {
+  background-color: blue;
+  border: none !important;
+}
+.battleship {
+  background-color: #9dde9d;
+  border: none !important;
+}
+.patrol-boat {
+  background-color: pink;
+  border: none !important;
+}
+.carrier {
+  background-color: purple;
+  border: none !important;
+}
+.submarine {
+  background-color: yellow;
+  border: none !important;
+}
+.tip {
+  border-top-left-radius: 50%;
+  border-bottom-left-radius: 50%;
+}
+
+.vtip {
+  border-end-end-radius: 50%;
+  border-end-start-radius: 50%;
 }

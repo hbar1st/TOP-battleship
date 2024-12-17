@@ -26,7 +26,7 @@ function createPlayer(type, pname) {
   const battleship = new Battleship();
   const destroyer = new Destroyer();
   const submarine = new Submarine();
-  const patrolBoat = new Ship(2, "Patrol Boat");
+  const patrolBoat = new PatrolBoat();
 
   const board = new Gameboard(type);
   const name = pname;
@@ -36,7 +36,7 @@ function createPlayer(type, pname) {
   board.placeShip(destroyer, 2, 0, Gameboard.horizontal); // (2,0), (3, 0), (4,0)
   board.placeShip(submarine, 7, 7, Gameboard.horizontal); // (7, 7), (8, 7), (9, 7)
   board.placeShip(battleship, 2, 4, Gameboard.vertical); // (2, 4), (2, 5), (2, 6), (2,7)
-  board.placeShip(carrier, 3, 2, Gameboard.vertical); // (2,0), (3, 0), (4,0)
+  board.placeShip(carrier, 3, 2, Gameboard.vertical); // (3,2), (3, 3), (3,4) (3, 5) (3,6)
 
   const getBoard = () => {
     return board;

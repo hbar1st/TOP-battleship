@@ -71,14 +71,28 @@ submitBtn.addEventListener("click", (event) => {
 
 function formNewGrid(gridEl, gameboard) {
   const ships = gameboard.ships;
-
+  let rowLabel = 0;
+  let colLabel = "A".charCodeAt(0);
   let gridArr = []; // a grid array of divs
 
-  for (let i = 0; i < gameboard.size; i++) {
+  for (let i = 0; i < gameboard.size + 1; i++) {
     const row = [];
-    for (let j = 0; j < gameboard.size; j++) {
+    for (let j = 0; j < gameboard.size + 1; j++) {
       const div = document.createElement("div");
       div.classList.add("cell");
+      if (i === gameboard.size && j !== 0) {
+        div.innerText = rowLabel;
+        div.classList.add("label");
+        div.classList.remove("cell");
+        rowLabel++;
+      }
+      if (j === 0 && i < gameboard.size) {
+        div.innerText = String.fromCharCode(colLabel);
+        div.classList.add("label");
+
+        div.classList.remove("cell");
+        colLabel++;
+      }
       row.push(div);
     }
     gridArr.push(row);
@@ -111,28 +125,28 @@ function formNewGrid(gridEl, gameboard) {
     div.classList.add("ship", shipSpot.ship.id);
     if (shipSpot.dir === "hor") {
       // (3,2), (3, 3), (3,4) (3, 5) (3,6) row
-      div.style.gridColumn = `${shipSpot.x1 + 1} / span ${
+      div.style.gridColumn = `${shipSpot.x1 + 2} / span ${
         shipSpot.ship.length
       }`;
-      div.style.gridRow = gameboard.size - shipSpot.y1;
+      div.style.gridRow = gameboard.size - shipSpot.y1 + 1;
       div.classList.add("vmargin");
     } else {
       div.style.gridRow = `${
-        gameboard.size - shipSpot.ship.length - shipSpot.y1 + 1
+        gameboard.size - shipSpot.ship.length - shipSpot.y1 + 2
       } / span ${shipSpot.ship.length}`;
-      div.style.gridColumn = 1 + shipSpot.x1;
+      div.style.gridColumn = 2 + shipSpot.x1;
       div.classList.add("hmargin");
     }
     gridEl.appendChild(div);
   });
 
   let mirrorboard = [];
-  for (let i = gameboard.size - 1; i >= 0; i--) {
+  for (let i = gameboard.size; i >= 0; i--) {
     mirrorboard.push(gridArr[i]);
   }
 
-  for (let i = 0; i < gameboard.size; i++) {
-    for (let j = 0; j < gameboard.size; j++) {
+  for (let i = 0; i < gameboard.size + 1; i++) {
+    for (let j = 0; j < gameboard.size + 1; j++) {
       mirrorboard[i][j].style.gridRow = i + 1;
       mirrorboard[i][j].style.gridColumn = j + 1;
       gridEl.appendChild(mirrorboard[i][j]);

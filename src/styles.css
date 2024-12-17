@@ -216,54 +216,83 @@ input:hover {
   background-color: #00bcd4;
 }
 
+div.label {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 3px ridge gray;
+}
 div#grid {
   box-shadow: 1px 1px 1px 1px black;
   border-radius: 5px;
   border: 6px ridge gray;
   display: grid;
-  grid-template-rows: repeat(10, max(4vw, 30px));
-  grid-template-columns: repeat(10, max(4vw, 30px));
+  grid-template-rows: repeat(11, max(4vw, 30px));
+  grid-template-columns: repeat(11, max(4vw, 30px));
 }
 
 div.cell {
   border: 2px outset black;
 }
 .hmargin {
-  margin: 2px 3px;
+  margin: 4px 3px;
 }
 .vmargin {
-  margin: 3px 2px;
+  margin: 3px 4px;
 }
 .ship {
-  border-radius: 55%;
+  border: 2px solid black;
+  border-radius: 35%;
   z-index: 3;
+
+  --s: 13px; /* control the size*/
+  --c1: #b9b9b9;
+  --c2: #8e8383;
+  --c3: #847070;
+
+  background: conic-gradient(
+        from 75deg,
+        var(--c1) 15deg,
+        var(--c2) 0 30deg,
+        #0000 0 180deg,
+        var(--c2) 0 195deg,
+        var(--c1) 0 210deg,
+        #0000 0
+      )
+      calc(var(--s) / 2) calc(0.5 * var(--s) / tan(30deg)),
+    conic-gradient(
+      var(--c1) 30deg,
+      var(--c3) 0 75deg,
+      var(--c1) 0 90deg,
+      var(--c2) 0 105deg,
+      var(--c3) 0 150deg,
+      var(--c2) 0 180deg,
+      var(--c3) 0 210deg,
+      var(--c1) 0 256deg,
+      var(--c2) 0 270deg,
+      var(--c1) 0 286deg,
+      var(--c2) 0 331deg,
+      var(--c3) 0
+    );
+  background-size: var(--s) calc(var(--s) / tan(30deg));
 }
+
 .destroyer {
   background-color: blue;
-  border: none !important;
 }
 .battleship {
   background-color: #9dde9d;
-  border: none !important;
 }
 .patrol-boat {
   background-color: pink;
-  border: none !important;
 }
 .carrier {
   background-color: purple;
-  border: none !important;
 }
 .submarine {
   background-color: yellow;
-  border: none !important;
-}
-.tip {
-  border-top-left-radius: 50%;
-  border-bottom-left-radius: 50%;
-}
-
-.vtip {
-  border-end-end-radius: 50%;
-  border-end-start-radius: 50%;
 }

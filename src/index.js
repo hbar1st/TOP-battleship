@@ -69,7 +69,7 @@ submitBtn.addEventListener("click", (event) => {
     mainPlayerGridInstructions.innerText =
       "Let's setup your board! Click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.";
     const gridEl = document.querySelector("#main-player-grid>#grid");
-    formNewGrid(gridEl, mainPlayer.getBoard());
+    formNewGrid(gridEl, mainPlayer);
     landingDialog.style.display = "none";
     const mainPlayerGrid = document.querySelector("#main-player-grid");
 
@@ -77,7 +77,8 @@ submitBtn.addEventListener("click", (event) => {
   }
 });
 
-function formNewGrid(gridEl, gameboard) {
+function formNewGrid(gridEl, currentPlayer) {
+  const gameboard = currentPlayer.getBoard();
   const ships = gameboard.ships;
   let rowLabel = 0;
   let colLabel = "A".charCodeAt(0);
@@ -129,29 +130,7 @@ function formNewGrid(gridEl, gameboard) {
       }
     }*/
 
-    const div = document.createElement("div");
-    div.classList.add("ship", shipSpot.ship.id);
-    div.addEventListener("click", shiftMode);
-    if (shipSpot.dir === "hor") {
-      // (3,2), (3, 3), (3,4) (3, 5) (3,6) row
-      div.style.gridColumn = `${shipSpot.x1 + 2} / span ${
-        shipSpot.ship.length
-      }`;
-      div.style.gridRow = gameboard.size - shipSpot.y1 + 1;
-      div.setAttribute("data-dir", "hor");
-      div.setAttribute("data-x1", shipSpot.x1);
-      div.setAttribute("data-y1", shipSpot.x1);
-      div.classList.add("vmargin");
-    } else {
-      div.style.gridRow = `${
-        gameboard.size - shipSpot.ship.length - shipSpot.y1 + 2
-      } / span ${shipSpot.ship.length}`;
-      div.style.gridColumn = 2 + shipSpot.x1;
-      div.setAttribute("data-dir", "ver");
-      div.setAttribute("data-x1", shipSpot.x1);
-      div.setAttribute("data-y1", shipSpot.x1);
-      div.classList.add("hmargin");
-    }
+    const div = makeShipEl(shipSpot, currentPlayer);
     gridEl.appendChild(div);
   });
 
@@ -171,7 +150,7 @@ function formNewGrid(gridEl, gameboard) {
   console.log(gameboard.getBoardArray());
 }
 
-function shiftMode(e) {
+function shiftMode(e, currentPlayer) {
   if (e.target.classList.contains("ship")) {
     const child = e.target.children.item(0);
 
@@ -187,30 +166,75 @@ function shiftMode(e) {
         : e.target.appendChild(moveImg);
     }
     if (child && child.id === "move-anchor") {
-      const rotateImg = document.createElement("img");
-      rotateImg.setAttribute("src", `${rotateIcon}`);
-      rotateImg.setAttribute("alt", "rotate ship");
-      rotateImg.classList.add("ship-anchor");
-      rotateImg.setAttribute("id", "rotate-anchor");
-      rotateImg.addEventListener("click", rotateShip);
+      const rotateImg = createRotationImg(currentPlayer);
       e.target.replaceChild(rotateImg, child);
     }
   }
 }
 
-function dragShip(e) {
+function createRotationImg(currentPlayer) {
+  const rotateImg = document.createElement("img");
+  rotateImg.setAttribute("src", `${rotateIcon}`);
+  rotateImg.setAttribute("alt", "rotate ship");
+  rotateImg.classList.add("ship-anchor");
+  rotateImg.setAttribute("id", "rotate-anchor");
+  rotateImg.addEventListener("click", (e) => {
+    rotateShip(e, currentPlayer);
+  });
+  return rotateImg;
+}
+function dragShip(e, currentPlayer) {
   console.log(e.target);
   console.log(e.target.parentElement);
 }
-function rotateShip(e) {
+
+function rotateShip(e, currentPlayer) {
   console.log(e.target);
-
   console.log(e.target.parentElement);
+
   const shipEl = e.target.parentElement;
-
   const dir = shipEl.getAttribute("data-dir");
-  const x1 = shipEl.getAttribute("data-x1");
-  const y1 = shipEl.getAttribute("data-y1");
+  const x1 = Number(shipEl.getAttribute("data-x1"));
+  const y1 = Number(shipEl.getAttribute("data-y1"));
 
-    if ( dir === Gameboard)
+  const gameboard = currentPlayer.getBoard();
+  const rotatedShipObj = gameboard.rotateShip(x1, y1);
+  //if the rotated ship is in a different location, then replace the old ship element
+  if (
+    rotatedShipObj.dir !== dir ||
+    rotatedShipObj.x1 !== x1 ||
+    rotatedShipObj.y1 !== y1
+  ) {
+    const rotatedShipEl = makeShipEl(rotatedShipObj, currentPlayer);
+    const rotateImg = createRotationImg(currentPlayer);
+    rotatedShipEl.appendChild(rotateImg);
+    shipEl.parentElement.replaceChild(rotatedShipEl, shipEl);
+  }
+}
+
+function makeShipEl(shipSpot, currentPlayer) {
+  const gameboard = currentPlayer.getBoard();
+  const div = document.createElement("div");
+  div.classList.add("ship", shipSpot.ship.id);
+  div.addEventListener("click", (e) => {
+    shiftMode(e, currentPlayer);
+  });
+  if (shipSpot.dir === "hor") {
+    div.style.gridColumn = `${shipSpot.x1 + 2} / span ${shipSpot.ship.length}`;
+    div.style.gridRow = gameboard.size - shipSpot.y1 + 1;
+    div.setAttribute("data-dir", "hor");
+    div.setAttribute("data-x1", shipSpot.x1);
+    div.setAttribute("data-y1", shipSpot.y1);
+    div.classList.add("vmargin");
+  } else {
+    div.style.gridRow = `${
+      gameboard.size - shipSpot.ship.length - shipSpot.y1 + 2
+    } / span ${shipSpot.ship.length}`;
+    div.style.gridColumn = 2 + shipSpot.x1;
+    div.setAttribute("data-dir", "ver");
+    div.setAttribute("data-x1", shipSpot.x1);
+    div.setAttribute("data-y1", shipSpot.y1);
+    div.classList.add("hmargin");
+  }
+  return div;
 }

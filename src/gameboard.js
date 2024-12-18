@@ -154,19 +154,33 @@ export class Gameboard {
           );
           if (rotRes) {
             shipObj.x1 = shipObj.x1 - shipObj.ship.length + 1;
+          } else {
+            //rotate 270deg anti-clockwise
+            rotRes = this.placeShip(
+              shipObj.ship,
+              shipObj.x1,
+              shipObj.y1 - shipObj.ship.length + 1,
+              "ver"
+            );
+            if (rotRes) {
+              shipObj.dir = "ver";
+              shipObj.y1 = shipObj.y1 - shipObj.ship.length + 1;
+            }
           }
         }
       } else {
+        // turn 90deg left
         let rotRes = this.placeShip(
           shipObj.ship,
-          shipObj.x1,
+          shipObj.x1 - shipObj.ship.length + 1,
           shipObj.y1,
           "hor"
         );
         if (rotRes) {
           shipObj.dir = "hor";
+          shipObj.x1 = shipObj.x1 - shipObj.ship.length + 1;
         } else {
-          //try to rotate 180deg left
+          //try to rotate 180deg left (anti-clockwise)
           rotRes = this.placeShip(
             shipObj.ship,
             shipObj.x1,
@@ -175,6 +189,12 @@ export class Gameboard {
           );
           if (rotRes) {
             shipObj.y1 = shipObj.y1 - shipObj.ship.length + 1;
+          } else {
+            // try to rotate 270deg anti-clockwise
+            rotRes = this.placeShip(shipObj.ship, shipObj.x1, shipObj.y1);
+            if (rotRes) {
+              shipObj.dir = "hor";
+            }
           }
         }
       }

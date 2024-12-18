@@ -1,17 +1,24 @@
 import { Gameboard } from "./gameboard.js";
-import { Ship, Submarine } from "./ship.js";
+import {
+  Battleship,
+  Carrier,
+  Destroyer,
+  PatrolBoat,
+  Ship,
+  Submarine,
+} from "./ship.js";
 
 describe("Gameboard Test", () => {
   const gameboard = new Gameboard("Player");
-  const patrolBoat = new Ship(2, "Patrol Boat");
+  const patrolBoat = new PatrolBoat();
   const patrolBoat1 = new Ship(2, "Patrol Boat 1");
   const patrolBoat2 = new Ship(2, "Patrol Boat 2");
-  const destroyer = new Ship(3, "Destroyer");
-  const carrier = new Ship(5, "Carrier");
+  const destroyer = new Destroyer();
+  const carrier = new Carrier();
   const carrier1 = new Ship(5, "Carrier 1");
   const carrier2 = new Ship(5, "Carrier 2");
 
-  const battleship = new Ship(4, "Battleship");
+  const battleship = new Battleship();
 
   test("Gameboard Object Created", () => {
     expect(gameboard).toBeInstanceOf(Gameboard);
@@ -23,6 +30,10 @@ describe("Gameboard Test", () => {
     expect(gameboard.placeShip(patrolBoat, 0, 0, Gameboard.horizontal)).toBe(
       true
     );
+  });
+
+  test("Gameboard Get Ship By ID - Negative Test", () => {
+    expect(gameboard.getShipById(carrier.id)).toBeNull();
   });
 
   test("Gameboard Returns Ship List From Ships Property", () => {
@@ -78,6 +89,16 @@ describe("Gameboard Test", () => {
 
   test("Gameboard Place Carrier in Empty Spot, Horizontally", () => {
     expect(gameboard.placeShip(carrier, 1, 2, Gameboard.horizontal)).toBe(true);
+  });
+
+  test("Gameboard Get Ship By ID - Positive Test", () => {
+    const expected = {
+      dir: "hor",
+      ship: carrier,
+      x1: 1,
+      y1: 2,
+    };
+    expect(gameboard.getShipById(carrier.id)).toMatchObject(expected);
   });
 
   test("Gameboard Carrier in Fully Occupied Spot, Horizontally", () => {

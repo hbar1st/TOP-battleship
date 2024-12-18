@@ -32,6 +32,11 @@ export class Gameboard {
     return this.#size;
   }
 
+  getShipById(id) {
+    const result = this.#ships.filter((el) => el.ship.id === id);
+    return result.length ? result[0] : null;
+  }
+
   getBoardArray(obfuscate = false) {
     //if obfuscate is true, the ships are not shown, only the hits if any are shown
     // Note: (0,0) is the lower-left corner of the grid like a normal cartesian plane

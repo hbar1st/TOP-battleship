@@ -84,55 +84,35 @@ function formNewGrid(gridEl, currentPlayer) {
   let colLabel = "A".charCodeAt(0);
   let gridArr = []; // a grid array of divs
 
+  ships.forEach((shipSpot) => {
+    const div = makeShipEl(shipSpot, currentPlayer);
+    gridEl.appendChild(div);
+  });
+
   for (let i = 0; i < gameboard.size + 1; i++) {
     const row = [];
     for (let j = 0; j < gameboard.size + 1; j++) {
       const div = document.createElement("div");
-      div.classList.add("cell");
       if (i === gameboard.size && j !== 0) {
         div.innerText = rowLabel;
         div.classList.add("label");
-        div.classList.remove("cell");
         rowLabel++;
       }
       if (j === 0 && i < gameboard.size) {
         div.innerText = String.fromCharCode(colLabel);
         div.classList.add("label");
-
-        div.classList.remove("cell");
         colLabel++;
+      }
+      if (j === 0 && i === gameboard.size) {
+        div.classList.add("label");
+      }
+      if (!div.classList.contains("label")) {
+        div.classList.add("cell");
       }
       row.push(div);
     }
     gridArr.push(row);
   }
-
-  ships.forEach((shipSpot) => {
-    /*
-    for (let i = 0; i < shipSpot.ship.length; i++) {
-      if (shipSpot.dir === "hor") {
-        gridArr[shipSpot.y1][shipSpot.x1 + i].classList.add(
-          shipSpot.ship.id,
-          "vmargin"
-        );
-
-        if (i == 0) {
-          gridArr[shipSpot.y1][shipSpot.x1].classList.add("tip");
-        }
-      } else {
-        gridArr[shipSpot.y1 + i][shipSpot.x1].classList.add(
-          shipSpot.ship.id,
-          "hmargin"
-        );
-        if (i == 0) {
-          gridArr[shipSpot.y1][shipSpot.x1].classList.add("vtip");
-        }
-      }
-    }*/
-
-    const div = makeShipEl(shipSpot, currentPlayer);
-    gridEl.appendChild(div);
-  });
 
   let mirrorboard = [];
   for (let i = gameboard.size; i >= 0; i--) {
@@ -143,6 +123,25 @@ function formNewGrid(gridEl, currentPlayer) {
     for (let j = 0; j < gameboard.size + 1; j++) {
       mirrorboard[i][j].style.gridRow = i + 1;
       mirrorboard[i][j].style.gridColumn = j + 1;
+      if (!mirrorboard[i][j].classList.contains("label")) {
+        mirrorboard[i][j].addEventListener("dragenter", (e) => {
+          console.log("dragenter: ", e.target);
+          e.preventDefault();
+        });
+        mirrorboard[i][j].addEventListener("dragover", (e) => {
+          console.log("dragover: ", e.target.style.gridArea);
+          e.preventDefault();
+        });
+        mirrorboard[i][j].addEventListener("drop", (e) => {
+          const id = e.dataTransfer.getData("text/plain");
+          console.log("dataTransfer: ", id);
+          //find out if the locations we are dropping into are free
+
+          //if spots are free, then update the gridRow & gridColumn of the ship
+          const ship = document.querySelector(`#${id}`);
+          console.log("shipEl: ", ship);
+        });
+      }
       gridEl.appendChild(mirrorboard[i][j]);
     }
   }
@@ -153,23 +152,88 @@ function formNewGrid(gridEl, currentPlayer) {
 function shiftMode(e, currentPlayer) {
   if (e.target.classList.contains("ship")) {
     const child = e.target.children.item(0);
+    const shipEl = e.target;
 
     if (!child || (child && child.id === "rotate-anchor")) {
+      shipEl.setAttribute("draggable", "true");
+      shipEl.addEventListener("dragstart", (event) => {
+        event.dataTransfer.setData("text/plain", shipEl.id);
+      });
+      shipEl.style.cursor = "grab";
       const moveImg = document.createElement("img");
       moveImg.setAttribute("src", `${moveIcon}`);
       moveImg.setAttribute("alt", "move ship");
       moveImg.classList.add("ship-anchor");
       moveImg.setAttribute("id", "move-anchor");
-      moveImg.addEventListener("mousedown", dragShip);
       child
         ? e.target.replaceChild(moveImg, child)
         : e.target.appendChild(moveImg);
     }
     if (child && child.id === "move-anchor") {
+      shipEl.setAttribute("draggable", "false");
+      shipEl.style.cursor = "pointer";
       const rotateImg = createRotationImg(currentPlayer);
       e.target.replaceChild(rotateImg, child);
     }
   }
+}
+
+/*
+function gridFree(gameboard, row, column, x1, y1, shiplength, shipdir) {
+    if (row < 2 || column < 2 || row > gameboard.size +2 || column > gameboard.size +2) {
+      return false;
+    }
+    // compile list of positions to check are free
+    const positions = getIndicatedSpots(gameboard, row, column, shiplength, shipdir);
+    if (positions === null) {
+      return false;
+    }
+    // iterate over list of ships and compile occupied positions
+    const shipPositions = getAllShipSpots(gameboard);
+
+    let found = 0;
+    positions.forEach((pos) => {
+      const occupiedSpot = shipPositions.find((el) => {
+        return el.x === pos.x && el.y === pos.y;
+      });
+      if (occupiedSpot) {
+        found++;
+      }
+    });
+    return found === 0;
+}
+*/
+
+function getAllShipSpots(gameboard) {
+  const shipPositions = [];
+  gameboard.ships.forEach((shipPos) => {
+    for (let i = 2; i < shipPos.ship.length + 2; i++) {
+      shipPos.dir === "hor"
+        ? shipPositions.push({ x: shipPos.x1 + i, y: shipPos.y1 })
+        : shipPositions.push({ x: shipPos.x1, y: shipPos.y1 + i });
+    }
+  });
+  return shipPositions;
+}
+// 12, 2 (equiv to 0,0, 0,1) ship lenth 2, dir hor
+function getIndicatedSpots(gameboard, row, col, shiplength, shipdir) {
+  const positions = [];
+  for (let i = 2; i < shiplength + 2; i++) {
+    if (shipdir === Gameboard.horizontal) {
+      const y2 = col + i;
+      if (y2 === gameboard.size) {
+        return null; //out of bounds
+      }
+      positions.push({ x: row, y: y2 });
+    } else {
+      const x2 = row + i;
+      if (x2 === gameboard.size) {
+        return null; //out of bounds
+      }
+      positions.push({ x: x2, y: col });
+    }
+  }
+  return positions;
 }
 
 function createRotationImg(currentPlayer) {
@@ -182,10 +246,6 @@ function createRotationImg(currentPlayer) {
     rotateShip(e, currentPlayer);
   });
   return rotateImg;
-}
-function dragShip(e, currentPlayer) {
-  console.log(e.target);
-  console.log(e.target.parentElement);
 }
 
 function rotateShip(e, currentPlayer) {
@@ -216,6 +276,7 @@ function makeShipEl(shipSpot, currentPlayer) {
   const gameboard = currentPlayer.getBoard();
   const div = document.createElement("div");
   div.classList.add("ship", shipSpot.ship.id);
+  div.setAttribute("id", shipSpot.ship.id);
   div.addEventListener("click", (e) => {
     shiftMode(e, currentPlayer);
   });

@@ -217,6 +217,7 @@ input:hover {
 }
 
 div.label {
+  text-shadow: 1px 1px 1px black;
   text-align: center;
   font-size: 1.1rem;
   font-weight: 500;
@@ -245,6 +246,8 @@ div.cell {
   margin: 3px 4px;
 }
 .ship {
+  
+
   border: 2px solid black;
   border-radius: 35%;
   z-index: 3;

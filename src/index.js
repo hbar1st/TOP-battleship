@@ -1,4 +1,6 @@
 import "./styles.css";
+import rotateIcon from "./rotate.svg";
+import moveIcon from "./move.svg";
 
 import { createHumanPlayer, createComputerPlayer } from "./player.js";
 
@@ -123,6 +125,7 @@ function formNewGrid(gridEl, gameboard) {
 
     const div = document.createElement("div");
     div.classList.add("ship", shipSpot.ship.id);
+    div.addEventListener("click", shiftMode);
     if (shipSpot.dir === "hor") {
       // (3,2), (3, 3), (3,4) (3, 5) (3,6) row
       div.style.gridColumn = `${shipSpot.x1 + 2} / span ${
@@ -154,4 +157,8 @@ function formNewGrid(gridEl, gameboard) {
   }
 
   console.log(gameboard.getBoardArray());
+}
+
+function shiftMode(e) {
+  console.log(e.target);
 }

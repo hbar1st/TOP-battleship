@@ -133,8 +133,11 @@ function formNewGrid(gridEl, currentPlayer) {
           e.preventDefault();
         });
         mirrorboard[i][j].addEventListener("drop", (e) => {
+          console.log("drop: ", e.target);
+          const row = e.target.style.gridRowStart;
+          const col = e.target.style.gridColumnStart;
           const id = e.dataTransfer.getData("text/plain");
-          console.log("dataTransfer: ", id);
+          console.log("dataTransfer: ", id, "target row/col: ", row, col);
           //find out if the locations we are dropping into are free
 
           //if spots are free, then update the gridRow & gridColumn of the ship
@@ -157,6 +160,19 @@ function shiftMode(e, currentPlayer) {
     if (!child || (child && child.id === "rotate-anchor")) {
       shipEl.setAttribute("draggable", "true");
       shipEl.addEventListener("dragstart", (event) => {
+        console.log(event.clientX, event.clientY);
+        const rect = shipEl.getBoundingClientRect();
+        if (shipEl.getAttribute("data-dir") === Gameboard.horizontal) {
+          const center = Math.round(rect.left + rect.width / 2);
+          if (rect.x > center) {
+            // user picked up the ship from the right
+          } else if (rect.x === center) {
+            //user picked up the ship from the center
+          } else {
+            //user picked up the ship from the left
+          }
+        }
+
         event.dataTransfer.setData("text/plain", shipEl.id);
       });
       shipEl.style.cursor = "grab";

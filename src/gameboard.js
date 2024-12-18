@@ -124,6 +124,64 @@ export class Gameboard {
     }
   }
 
+  rotateShip(x1, y1) {
+    //attempts to take which ever ship is at x1, y1 and rotate it
+    let shipObj = null;
+    for (let i = 0; i < this.#ships.length; i++) {
+      if (this.#ships[i].x1 === x1 && this.#ships[i].y1 === y1) {
+        shipObj = this.#ships[i];
+        break;
+      }
+    }
+    if (shipObj) {
+      if (shipObj.dir === "hor") {
+        //try to rotate 90deg left
+        let rotRes = this.placeShip(
+          shipObj.ship,
+          shipObj.x1,
+          shipObj.y1,
+          "ver"
+        );
+        if (rotRes) {
+          shipObj.dir = "ver";
+        } else {
+          //try to rotate 180deg left
+          rotRes = this.placeShip(
+            shipObj.ship,
+            shipObj.x1 - shipObj.ship.length + 1,
+            shipObj.y1,
+            "hor"
+          );
+          if (rotRes) {
+            shipObj.x1 = shipObj.x1 - shipObj.ship.length + 1;
+          }
+        }
+      } else {
+        let rotRes = this.placeShip(
+          shipObj.ship,
+          shipObj.x1,
+          shipObj.y1,
+          "hor"
+        );
+        if (rotRes) {
+          shipObj.dir = "hor";
+        } else {
+          //try to rotate 180deg left
+          rotRes = this.placeShip(
+            shipObj.ship,
+            shipObj.x1,
+            shipObj.y1 - shipObj.ship.length + 1,
+            "ver"
+          );
+          if (rotRes) {
+            shipObj.y1 = shipObj.y1 - shipObj.ship.length + 1;
+          }
+        }
+      }
+    }
+    return shipObj;
+  }
+
   getIndicatedSpots(x1, y1, length, dir) {
     const positions = [];
     for (let i = 0; i < length; i++) {
@@ -157,6 +215,9 @@ export class Gameboard {
   }
 
   boardFree(x1, y1, length, dir) {
+    if (x1 < 0 || y1 < 0 || x1 > this.#size - 1 || y1 > this.#size - 1) {
+      return false;
+    }
     // compile list of positions to check are free
     const positions = this.getIndicatedSpots(x1, y1, length, dir);
     if (positions === null) {

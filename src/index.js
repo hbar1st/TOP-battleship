@@ -3,6 +3,7 @@ import rotateIcon from "./rotate.svg";
 import moveIcon from "./move.svg";
 
 import { createHumanPlayer, createComputerPlayer } from "./player.js";
+import { Gameboard } from "./gameboard.js";
 
 //create the main human player
 
@@ -62,6 +63,11 @@ submitBtn.addEventListener("click", (event) => {
     const mainPlayer = createHumanPlayer(mainPlayerName.value); //always the human is the main player
     const mainPlayerGridTitle = document.querySelector("#main-player-grid>h1");
     mainPlayerGridTitle.innerText = `${mainPlayer.getName()}'s board`;
+    const mainPlayerGridInstructions = document.querySelector(
+      "#main-player-grid>h2"
+    );
+    mainPlayerGridInstructions.innerText =
+      "Let's setup your board! Click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.";
     const gridEl = document.querySelector("#main-player-grid>#grid");
     formNewGrid(gridEl, mainPlayer.getBoard());
     landingDialog.style.display = "none";
@@ -132,12 +138,18 @@ function formNewGrid(gridEl, gameboard) {
         shipSpot.ship.length
       }`;
       div.style.gridRow = gameboard.size - shipSpot.y1 + 1;
+      div.setAttribute("data-dir", "hor");
+      div.setAttribute("data-x1", shipSpot.x1);
+      div.setAttribute("data-y1", shipSpot.x1);
       div.classList.add("vmargin");
     } else {
       div.style.gridRow = `${
         gameboard.size - shipSpot.ship.length - shipSpot.y1 + 2
       } / span ${shipSpot.ship.length}`;
       div.style.gridColumn = 2 + shipSpot.x1;
+      div.setAttribute("data-dir", "ver");
+      div.setAttribute("data-x1", shipSpot.x1);
+      div.setAttribute("data-y1", shipSpot.x1);
       div.classList.add("hmargin");
     }
     gridEl.appendChild(div);
@@ -160,8 +172,6 @@ function formNewGrid(gridEl, gameboard) {
 }
 
 function shiftMode(e) {
-  console.log(e.target);
-
   if (e.target.classList.contains("ship")) {
     const child = e.target.children.item(0);
 
@@ -182,11 +192,25 @@ function shiftMode(e) {
       rotateImg.setAttribute("alt", "rotate ship");
       rotateImg.classList.add("ship-anchor");
       rotateImg.setAttribute("id", "rotate-anchor");
-      moveImg.addEventListener("click", rotateShip);
+      rotateImg.addEventListener("click", rotateShip);
       e.target.replaceChild(rotateImg, child);
     }
   }
 }
 
-function dragShip(e) {}
-function rotateShip(e) {}
+function dragShip(e) {
+  console.log(e.target);
+  console.log(e.target.parentElement);
+}
+function rotateShip(e) {
+  console.log(e.target);
+
+  console.log(e.target.parentElement);
+  const shipEl = e.target.parentElement;
+
+  const dir = shipEl.getAttribute("data-dir");
+  const x1 = shipEl.getAttribute("data-x1");
+  const y1 = shipEl.getAttribute("data-y1");
+
+    if ( dir === Gameboard)
+}

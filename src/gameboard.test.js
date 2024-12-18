@@ -47,6 +47,17 @@ describe("Gameboard Test", () => {
     );
   });
 
+  test("Gameboard Rotate Patrol Ship To Vertical Position", () => {
+    const shipObj = gameboard.rotateShip(0, 0);
+    const expected = {
+      dir: "ver",
+      ship: patrolBoat,
+      x1: 0,
+      y1: 0,
+    };
+    expect(shipObj).toMatchObject(expected);
+  });
+
   test("Gameboard Place Patrol Ship in Empty Spot, Vertically", () => {
     expect(gameboard.placeShip(patrolBoat, 0, 0, Gameboard.vertical)).toBe(
       true
@@ -192,4 +203,39 @@ describe("Gameboard Test", () => {
       expect.arrayContaining(expected)
     );
   });
+
+  test("Gameboard Rotate Patrol Ship To Horizontal Position", () => {
+    const gameboard = new Gameboard("Player", 5);
+
+    gameboard.placeShip(carrier, 0, 0, Gameboard.vertical); // (0,0), (0,1), (0, 2), (0, 3), (0, 4)
+
+    const shipObj = gameboard.rotateShip(0, 0);
+    const expected = {
+      dir: "hor",
+      ship: carrier,
+      x1: 0,
+      y1: 0,
+    };
+    expect(shipObj).toMatchObject(expected);
+  });
+
+  test("Gameboard Rotate Patrol Ship To Horizontal Out-of-Bounds Position", () => {
+    const gameboard = new Gameboard("Player", 5);
+
+    //gameboard.placeShip(carrier, 0, 0, Gameboard.vertical); // (0,0), (0,1), (0, 2), (0, 3), (0, 4)
+    gameboard.placeShip(carrier, 4, 0, Gameboard.vertical); // (4,0), (4,1), (4, 2), (4, 3), (4, 4)
+
+    const shipObj = gameboard.rotateShip(4, 0);
+    expect(shipObj).toBeNull();
+  });
+  /*
+  test("Gameboard Rotate Patrol Ship To Horizontal Occupied Position", () => {
+    const gameboard = new Gameboard("Player", 5);
+
+    gameboard.placeShip(carrier, 0, 0, Gameboard.vertical); // (0,0), (0,1), (0, 2), (0, 3), (0, 4)
+    gameboard.placeShip(carrier, 4, 0, Gameboard.vertical); // (4,0), (4,1), (4, 2), (4, 3), (4, 4)
+
+    const shipObj = gameboard.rotateShip(0, 0);
+    expect(shipObj).toBeNull();
+  });*/
 });

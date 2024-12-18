@@ -161,4 +161,32 @@ function formNewGrid(gridEl, gameboard) {
 
 function shiftMode(e) {
   console.log(e.target);
+
+  if (e.target.classList.contains("ship")) {
+    const child = e.target.children.item(0);
+
+    if (!child || (child && child.id === "rotate-anchor")) {
+      const moveImg = document.createElement("img");
+      moveImg.setAttribute("src", `${moveIcon}`);
+      moveImg.setAttribute("alt", "move ship");
+      moveImg.classList.add("ship-anchor");
+      moveImg.setAttribute("id", "move-anchor");
+      moveImg.addEventListener("mousedown", dragShip);
+      child
+        ? e.target.replaceChild(moveImg, child)
+        : e.target.appendChild(moveImg);
+    }
+    if (child && child.id === "move-anchor") {
+      const rotateImg = document.createElement("img");
+      rotateImg.setAttribute("src", `${rotateIcon}`);
+      rotateImg.setAttribute("alt", "rotate ship");
+      rotateImg.classList.add("ship-anchor");
+      rotateImg.setAttribute("id", "rotate-anchor");
+      moveImg.addEventListener("click", rotateShip);
+      e.target.replaceChild(rotateImg, child);
+    }
+  }
 }
+
+function dragShip(e) {}
+function rotateShip(e) {}

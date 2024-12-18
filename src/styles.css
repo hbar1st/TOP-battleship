@@ -246,8 +246,9 @@ div.cell {
   margin: 3px 4px;
 }
 .ship {
-  
-
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
   border: 2px solid black;
   border-radius: 35%;
   z-index: 3;
@@ -298,4 +299,10 @@ div.cell {
 }
 .submarine {
   background-color: yellow;
+}
+
+.ship-anchor {
+  fill: white;
+  align-self: center;
+  justify-self: center;
 }

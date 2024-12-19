@@ -8,6 +8,14 @@
   <body>
     <main>
       <div id="current-player-grid"></div>
+      <div id="fleet-status" class="pre-show">
+        <!--<h3>Hits Scored Against Your Fleet:</h3>
+        <p>Carrier: <span class="hit-score">0</span><span>/5</span></p>
+        <p>Battleship: <span class="hit-score">0</span><span>/4</span></p>
+        <p>Submarine: <span class="hit-score">0</span><span>/3</span></p>
+        <p>Destroyer: <span class="hit-score">0</span><span>/3</span></p>
+        <p>Patrol Boat: <span class="hit-score">0</span><span>/2</span></p>-->
+      </div>
       <dialog open id="landing-dialog">
         <div id="circle">
           <header>
@@ -53,5 +61,15 @@
         </div>
       </dialog>
     </main>
+
+    <dialog id="your-turn-dialog">
+      <div>
+        <div id="player-name"></div>
+        <div>IT'S</div>
+        <div>YOUR</div>
+        <div>TURN</div>
+        <button type="button">Let's go!</button>
+      </div>
+    </dialog>
   </body>
 </html>

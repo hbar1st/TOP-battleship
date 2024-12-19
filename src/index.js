@@ -30,7 +30,7 @@ opponentName.addEventListener("input", () => {
   }
 });
 
-const submitBtn = document.querySelector("button");
+const submitBtn = document.querySelector("form button");
 submitBtn.addEventListener("click", (event) => {
   event.preventDefault();
   let opponentPlayer;
@@ -110,6 +110,9 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
         }, 500);
       });
     } else {
+      playerGridLockButton.addEventListener("click", (e) => {
+        play(e, mainPlayer, opponentPlayer);
+      });
     }
   }
   playerGridInstructions.innerHTML = playerGridTitle;
@@ -123,11 +126,26 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   showElement(playerGrid);
 }
 
-function showElement(el) {
+function showElement(el, timeout = 0) {
   setTimeout(() => {
     el.classList.remove("pre-show");
+    el.classList.remove("hide");
     el.classList.add("show");
-  }, 0);
+  }, timeout);
+}
+
+function staggeredShowElement(elList) {
+  console.log(elList);
+  const timedShow = (el, timeout) => {
+    setTimeout(() => {
+      el.classList.remove("pre-show");
+      el.classList.remove("hide");
+      el.classList.add("show");
+    }, timeout);
+  };
+  elList.forEach(async (el, i) => {
+    await timedShow(el, (i + 2) * 100);
+  });
 }
 
 function makePlayerGridDisplay() {
@@ -143,9 +161,20 @@ function makePlayerGridDisplay() {
 
 function play(e, mainPlayer, oppPlayer) {
   makePlayerGridDisplay();
+  const fleetStatusEl = document.querySelector("#fleet-status");
+  const currentPlayer = e.target.id === "main-player" ? mainPlayer : oppPlayer;
   const parentEl = document.querySelector("#current-player-grid");
-  parentEl.classList.add("pre-show"); //scales the element to hide it
-  showElement(parentEl);
+  if (e.target.id !== "main-player-turn" && e.target.id !== "opp-player-turn") {
+    parentEl.classList.add("pre-show"); //scales the element to hide it
+    showElement(parentEl);
+
+    showElement(fleetStatusEl);
+  } else {
+    parentEl.classList.remove("show");
+    fleetStatusEl.classList.remove("show");
+    parentEl.classList.add("hide");
+    fleetStatusEl.classList.add("hide");
+  }
   const gridEl = document.querySelector("#current-player-grid>#grid");
 
   const instructionsEl = document.querySelector(
@@ -194,9 +223,32 @@ function play(e, mainPlayer, oppPlayer) {
     e.target.id === "opp-player-turn"
   ) {
     //display hold page with a button to allow players to hand each other the computer
+    const yourTurnDialog = document.querySelector("#your-turn-dialog");
+    const yourTurnDialogBtn = document.querySelector(
+      "#your-turn-dialog>div>button"
+    );
+    if (e.target.id === "main-player-turn") {
+      yourTurnDialogBtn.setAttribute("id", "main-player");
+    } else {
+      yourTurnDialogBtn.setAttribute("id", "opp-player");
+    }
+    const playerNameEl = document.querySelector("#player-name");
+    playerNameEl.innerText = `${mainPlayer.getName()}`;
+    yourTurnDialogBtn.addEventListener("click", (e) => {
+      yourTurnDialog.close();
+      play(e, mainPlayer, oppPlayer);
+    });
+
+    yourTurnDialog.showModal();
+    const dialogDivs = document.querySelectorAll("#your-turn-dialog>div>*");
+    staggeredShowElement(dialogDivs);
   }
   instructionsEl.innerHTML = playerInstructions;
-  instructionsEl.appendChild(nextButton);
+  if (nextButton) {
+    instructionsEl.appendChild(nextButton);
+  }
+
+  //display a summary of hits against the fleet
 }
 
 function displayTargetGrid(gridEl, currentPlayer) {

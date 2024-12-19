@@ -123,7 +123,15 @@ h1 {
   justify-content: center;
   align-items: center;
   font-size: clamp(14px, 4vw, 3.5rem);
+  border-top: 2px solid #808080;
+
+  padding: 2px 0px;
 }
+h1,
+h2 {
+  border-bottom: 2px solid #808080;
+}
+
 h1 > em {
   font-size: clamp(18px, 6vw, 4.5rem);
   letter-spacing: 1px;
@@ -217,11 +225,11 @@ button {
   font-size: clamp(14px, 1.3rem, 2vw);
   padding: 10px 0px;
   border-radius: 5px;
-  font-family: "Courier New", Courier, monospace;
   font-weight: 600;
   font-variant-ligatures: none;
   width: 70%;
   align-self: center;
+  font-family: "macondo_swash_capsregular";
 }
 
 button:hover,
@@ -248,8 +256,9 @@ input:hover {
     margin-top: 5px;
   }
   input {
-    padding: 5px;
+    padding: 2px 7px;
     border-radius: 5px;
+    font-family: "macondo_swash_capsregular";
   }
 }
 

@@ -77,7 +77,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
     "#current-player-grid>.instructions"
   );
 
-  const playerGridTitle = `<h1>${mainPlayer.getName()}'s board</h1>`;
+  const playerGridTitle = `<h1>${currentPlayer.getName()}'s board</h1>`;
   /**
      *         
      * <h1></h1>
@@ -103,7 +103,11 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
     if (currentPlayer === mainPlayer) {
       // allow the human opponent to setup their board!
       playerGridLockButton.addEventListener("click", () => {
-        setupPlayerShips(opponentPlayer, mainPlayer, opponentPlayer);
+        playerGrid.classList.remove("show");
+        playerGrid.classList.add("hide");
+        setTimeout(() => {
+          setupPlayerShips(opponentPlayer, mainPlayer, opponentPlayer);
+        }, 500);
       });
     } else {
     }
@@ -139,6 +143,9 @@ function makePlayerGridDisplay() {
 
 function play(e, mainPlayer, oppPlayer) {
   makePlayerGridDisplay();
+  const parentEl = document.querySelector("#current-player-grid");
+  parentEl.classList.add("pre-show"); //scales the element to hide it
+  showElement(parentEl);
   const gridEl = document.querySelector("#current-player-grid>#grid");
 
   const instructionsEl = document.querySelector(
@@ -157,7 +164,7 @@ function play(e, mainPlayer, oppPlayer) {
     e.target.id === "main-player" ||
     (e.target.id === "opp-player" && !computerIsPlaying)
   ) {
-    playerInstructions = `<h1>${mainPlayer.getName()}'s Target board</h1><p>Clicking a cell will shoot a torpedo at that location.</p>`;
+    playerInstructions = `<h1>${currentPlayer.getName()}'s Target board</h1><p>Clicking a cell will shoot a torpedo at that location.</p>`;
     if (!computerIsPlaying) {
       playerInstructions += `<p>After you're done click "next", then hand your device over to the other player.</p>`;
     } else {

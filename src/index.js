@@ -10,8 +10,6 @@ import {
 
 import { Gameboard } from "./gameboard.js";
 
-//create the main human player
-
 const landingDialog = document.querySelector("#landing-dialog");
 const form = document.querySelector("form");
 const mainPlayerName = document.querySelector("#main-player");
@@ -131,11 +129,22 @@ function makePlayerGridDisplay() {
   const parentEl = document.querySelector("#current-player-grid");
   const instructionsEl = document.createElement("div");
   instructionsEl.classList.add("instructions");
-  const gridEl = document.createElement("div");
-  gridEl.setAttribute("id", "grid");
   parentEl.innerHTML = ""; //clear out the old elements
   parentEl.appendChild(instructionsEl);
+  addGridEl(parentEl);
+}
+
+function addGridEl(parentEl) {
+  const gridEl = document.createElement("div");
+  gridEl.setAttribute("id", "grid");
   parentEl.appendChild(gridEl);
+  return gridEl;
+}
+
+function torpedo(e) {
+  console.log(e.target);
+  console.log(e.target.classList);
+  console.log(e.target.gridArea);
 }
 
 function play(e, mainPlayer, oppPlayer) {
@@ -145,8 +154,12 @@ function play(e, mainPlayer, oppPlayer) {
   const parentEl = document.querySelector("#current-player-grid");
   if (e.target.id !== "main-player-turn" && e.target.id !== "opp-player-turn") {
     parentEl.classList.add("pre-show"); //scales the element to hide it
+    parentEl.addEventListener("click", torpedo);
     showElement(parentEl);
-
+    fleetStatusEl.classList.add("pre-show");
+    fleetStatusEl.innerHTML = ""; //clear out the old elements
+    fleetStatusEl.innerHTML = "<h3>Your Fleet Board</h3>";
+    displayShipsGrid(addGridEl(fleetStatusEl), currentPlayer, true);
     showElement(fleetStatusEl);
   } else {
     parentEl.classList.remove("show");
@@ -280,7 +293,13 @@ function displayTargetGrid(gridEl, currentPlayer) {
   }
 }
 
-function displayShipsGrid(gridEl, currentPlayer) {
+/**
+ *
+ * @param {*} gridEl the div#grid element
+ * @param {*} currentPlayer
+ * @param {*} unresponsive set to true if displaying the board after the game has started (setup done earlier)
+ */
+function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
   const gameboard = currentPlayer.getBoard();
   const ships = gameboard.ships;
   let rowLabel = 0;
@@ -288,7 +307,7 @@ function displayShipsGrid(gridEl, currentPlayer) {
   let gridArr = []; // a grid array of divs
 
   ships.forEach((shipSpot) => {
-    const div = makeShipEl(shipSpot, currentPlayer);
+    const div = makeShipEl(shipSpot, currentPlayer, unresponsive);
     gridEl.appendChild(div);
   });
 
@@ -326,7 +345,8 @@ function displayShipsGrid(gridEl, currentPlayer) {
     for (let j = 0; j < gameboard.size + 1; j++) {
       mirrorboard[i][j].style.gridRow = i + 1;
       mirrorboard[i][j].style.gridColumn = j + 1;
-      if (!mirrorboard[i][j].classList.contains("label")) {
+
+      if (!unresponsive && !mirrorboard[i][j].classList.contains("label")) {
         mirrorboard[i][j].addEventListener("dragenter", (e) => {
           console.log("dragenter: ", e.target);
           e.preventDefault();

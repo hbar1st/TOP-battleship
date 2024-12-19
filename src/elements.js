@@ -19,14 +19,16 @@ function staggeredShowElement(elList) {
   });
 }
 
-function makeShipEl(shipSpot, currentPlayer) {
+function makeShipEl(shipSpot, currentPlayer, unresponsive) {
   const gameboard = currentPlayer.getBoard();
   const div = document.createElement("div");
   div.classList.add("ship", shipSpot.ship.id);
   div.setAttribute("id", shipSpot.ship.id);
-  div.addEventListener("click", (e) => {
-    shiftMode(e, currentPlayer);
-  });
+  if (!unresponsive) {
+    div.addEventListener("click", (e) => {
+      shiftMode(e, currentPlayer);
+    });
+  }
   if (shipSpot.dir === "hor") {
     div.style.gridColumn = `${shipSpot.x1 + 2} / span ${shipSpot.ship.length}`;
     div.style.gridRow = gameboard.size - shipSpot.y1 + 1;

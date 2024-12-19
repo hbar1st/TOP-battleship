@@ -59,7 +59,7 @@ submitBtn.addEventListener("click", (event) => {
     }
   }
   if (valid) {
-    //commence the game
+    //start the game
     const mainPlayer = createHumanPlayer(mainPlayerName.value); //always the human is the main player
     const mainPlayerGridTitle = document.querySelector("#main-player-grid>h1");
     mainPlayerGridTitle.innerText = `${mainPlayer.getName()}'s board`;
@@ -137,12 +137,106 @@ function formNewGrid(gridEl, currentPlayer) {
           const row = e.target.style.gridRowStart;
           const col = e.target.style.gridColumnStart;
           const id = e.dataTransfer.getData("text/plain");
-          console.log("dataTransfer: ", id, "target row/col: ", row, col);
+          const mouseLoc = e.dataTransfer.getData("mouseLoc");
+          console.log(
+            "dataTransfer: ",
+            id,
+            "mouseLoc: ",
+            mouseLoc,
+            "target row/col: ",
+            row,
+            col
+          );
           //find out if the locations we are dropping into are free
+          let x1 = col;
+          let y1 = row;
+          const shipData = gameboard.getShipById(id);
+          if (shipData.dir === Gameboard.horizontal) {
+            if (mouseLoc === "center") {
+              const delta = Math.floor(shipData.ship.length / 2);
+              x1 = x1 - delta;
+            } else if (mouseLoc === "right") {
+              const delta = Math.floor(shipData.ship.length / 2);
+              x1 = x1 - shipData.ship.length + delta;
+            }
+          } else {
+            if (mouseLoc === "center") {
+              const delta = Math.floor(shipData.ship.length / 2);
+              y1 = y1 - delta;
+            } else if (mouseLoc === "bottom") {
+              const delta = Math.floor(shipData.ship.length / 2);
+              y1 = y1 - shipData.ship.length + delta;
+            }
+          }
 
+          const shipEl = document.querySelector(`#${id}`);
           //if spots are free, then update the gridRow & gridColumn of the ship
-          const ship = document.querySelector(`#${id}`);
-          console.log("shipEl: ", ship);
+          if (shipData.dir === Gameboard.horizontal) {
+            let placed = false;
+            let maxTries = gameboard.size * 2;
+            let x = x1 - 2;
+            let y = gameboard.size - y1 + 1;
+            do {
+              maxTries--;
+              placed = gameboard.placeShip(
+                shipData.ship,
+                x,
+                y,
+                Gameboard.horizontal
+              );
+              if (!placed) {
+                if (x + shipData.ship.length > gameboard.size) {
+                  x--;
+                }
+                if (x < 0) {
+                  x++;
+                }
+              }
+            } while (!placed && maxTries > 0);
+            if (placed) {
+              const col = x + 2;
+              const row = gameboard.size - y + 1;
+              shipEl.style.gridColumn = `${col} / span ${shipData.ship.length}`;
+              shipEl.style.gridRow = row;
+              shipEl.setAttribute("data-dir", "hor");
+              shipEl.setAttribute("data-x1", x); //0-based col in ship array
+              shipEl.setAttribute("data-y1", y); //0-based row in ship array
+              console.log("new shipEl: ", shipEl);
+            }
+          } else {
+            let placed = false;
+            let maxTries = gameboard.size * 2;
+            let x = x1 - 2;
+            let y = gameboard.size - y1 + 1;
+            do {
+              maxTries--;
+              placed = gameboard.placeShip(
+                shipData.ship,
+                x,
+                y,
+                Gameboard.vertical
+              );
+              if (!placed) {
+                if (y + shipData.ship.length > gameboard.size) {
+                  y--;
+                }
+                if (y < 0) {
+                  y++;
+                }
+              }
+            } while (!placed && maxTries > 0);
+            if (placed) {
+              const col = x + 2;
+              const row = gameboard.size - y + 1;
+              shipEl.style.gridColumn = col;
+              shipEl.style.gridRow = `${row} / span ${shipData.ship.length}`;
+              shipEl.setAttribute("data-dir", "ver");
+              shipEl.setAttribute("data-x1", x); //0-based col in ship array
+              shipEl.setAttribute("data-y1", y); //0-based row in ship array
+              console.log("new shipEl: ", shipEl);
+            }
+          }
+          console.log(shipData);
         });
       }
       gridEl.appendChild(mirrorboard[i][j]);
@@ -162,17 +256,34 @@ function shiftMode(e, currentPlayer) {
       shipEl.addEventListener("dragstart", (event) => {
         console.log(event.clientX, event.clientY);
         const rect = shipEl.getBoundingClientRect();
+        let mouseLoc = "right";
         if (shipEl.getAttribute("data-dir") === Gameboard.horizontal) {
           const center = Math.round(rect.left + rect.width / 2);
-          if (rect.x > center) {
+          if (event.clientX > center) {
             // user picked up the ship from the right
-          } else if (rect.x === center) {
+            mouseLoc = "right";
+          } else if (event.clientX === center) {
             //user picked up the ship from the center
+            mouseLoc = "center";
           } else {
             //user picked up the ship from the left
+            mouseLoc = "left";
+          }
+        } else {
+          //handle vertical ships
+          const center = Math.round(rect.top + rect.height / 2);
+          if (event.clientY > center) {
+            // user picked up the ship from the right
+            mouseLoc = "bottom";
+          } else if (event.clientY === center) {
+            //user picked up the ship from the center
+            mouseLoc = "center";
+          } else {
+            //user picked up the ship from the left
+            mouseLoc = "top";
           }
         }
-
+        event.dataTransfer.setData("mouseLoc", mouseLoc);
         event.dataTransfer.setData("text/plain", shipEl.id);
       });
       shipEl.style.cursor = "grab";
@@ -192,64 +303,6 @@ function shiftMode(e, currentPlayer) {
       e.target.replaceChild(rotateImg, child);
     }
   }
-}
-
-/*
-function gridFree(gameboard, row, column, x1, y1, shiplength, shipdir) {
-    if (row < 2 || column < 2 || row > gameboard.size +2 || column > gameboard.size +2) {
-      return false;
-    }
-    // compile list of positions to check are free
-    const positions = getIndicatedSpots(gameboard, row, column, shiplength, shipdir);
-    if (positions === null) {
-      return false;
-    }
-    // iterate over list of ships and compile occupied positions
-    const shipPositions = getAllShipSpots(gameboard);
-
-    let found = 0;
-    positions.forEach((pos) => {
-      const occupiedSpot = shipPositions.find((el) => {
-        return el.x === pos.x && el.y === pos.y;
-      });
-      if (occupiedSpot) {
-        found++;
-      }
-    });
-    return found === 0;
-}
-*/
-
-function getAllShipSpots(gameboard) {
-  const shipPositions = [];
-  gameboard.ships.forEach((shipPos) => {
-    for (let i = 2; i < shipPos.ship.length + 2; i++) {
-      shipPos.dir === "hor"
-        ? shipPositions.push({ x: shipPos.x1 + i, y: shipPos.y1 })
-        : shipPositions.push({ x: shipPos.x1, y: shipPos.y1 + i });
-    }
-  });
-  return shipPositions;
-}
-// 12, 2 (equiv to 0,0, 0,1) ship lenth 2, dir hor
-function getIndicatedSpots(gameboard, row, col, shiplength, shipdir) {
-  const positions = [];
-  for (let i = 2; i < shiplength + 2; i++) {
-    if (shipdir === Gameboard.horizontal) {
-      const y2 = col + i;
-      if (y2 === gameboard.size) {
-        return null; //out of bounds
-      }
-      positions.push({ x: row, y: y2 });
-    } else {
-      const x2 = row + i;
-      if (x2 === gameboard.size) {
-        return null; //out of bounds
-      }
-      positions.push({ x: x2, y: col });
-    }
-  }
-  return positions;
 }
 
 function createRotationImg(currentPlayer) {

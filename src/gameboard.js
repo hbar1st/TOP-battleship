@@ -119,10 +119,10 @@ export class Gameboard {
   placeShip(ship, x1, y1, dir = "hor") {
     // check if this ship was placed on the board earlier
     const otherShips = this.#ships.filter((s) => s.ship !== ship);
-    this.#ships = otherShips; //duplicate ship removed now
     //check if the area is free
-    if (this.boardFree(x1, y1, ship.length, dir)) {
-      this.#ships.push({ ship, x1, y1, dir });
+    if (this.boardFree(x1, y1, ship.length, dir, otherShips)) {
+      otherShips.push({ ship, x1, y1, dir });
+      this.#ships = otherShips;
       return true;
     } else {
       return false;
@@ -227,9 +227,9 @@ export class Gameboard {
     return positions;
   }
 
-  getAllShipSpots() {
+  getAllShipSpots(newShipArr = this.#ships) {
     const shipPositions = [];
-    this.#ships.forEach((shipPos) => {
+    newShipArr.forEach((shipPos) => {
       for (let i = 0; i < shipPos.ship.length; i++) {
         shipPos.dir === "hor"
           ? shipPositions.push({ x: shipPos.x1 + i, y: shipPos.y1 })
@@ -239,7 +239,7 @@ export class Gameboard {
     return shipPositions;
   }
 
-  boardFree(x1, y1, length, dir) {
+  boardFree(x1, y1, length, dir, newShipArr = this.#ships) {
     if (x1 < 0 || y1 < 0 || x1 > this.#size - 1 || y1 > this.#size - 1) {
       return false;
     }
@@ -249,7 +249,7 @@ export class Gameboard {
       return false;
     }
     // iterate over list of ships and compile occupied positions
-    const shipPositions = this.getAllShipSpots();
+    const shipPositions = this.getAllShipSpots(newShipArr);
 
     let found = 0;
     positions.forEach((pos) => {

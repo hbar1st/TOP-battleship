@@ -148,9 +148,13 @@ function formNewGrid(gridEl, currentPlayer) {
             col
           );
           //find out if the locations we are dropping into are free
-          let x1 = col;
-          let y1 = row;
+          let x1 = Number(col);
+          let y1 = Number(row);
           const shipData = gameboard.getShipById(id);
+          if (shipData === null) {
+            console.log("We have a bug here");
+            return;
+          }
           if (shipData.dir === Gameboard.horizontal) {
             if (mouseLoc === "center") {
               const delta = Math.floor(shipData.ship.length / 2);
@@ -162,10 +166,10 @@ function formNewGrid(gridEl, currentPlayer) {
           } else {
             if (mouseLoc === "center") {
               const delta = Math.floor(shipData.ship.length / 2);
-              y1 = y1 - delta;
-            } else if (mouseLoc === "bottom") {
+              y1 = y1 + delta;
+            } else if (mouseLoc === "top") {
               const delta = Math.floor(shipData.ship.length / 2);
-              y1 = y1 - shipData.ship.length + delta;
+              y1 = y1 + shipData.ship.length - delta;
             }
           }
 
@@ -226,8 +230,11 @@ function formNewGrid(gridEl, currentPlayer) {
               }
             } while (!placed && maxTries > 0);
             if (placed) {
+              console.log("shipData: ", shipData);
+              shipData.x1 = x;
+              shipData.y1 = y;
               const col = x + 2;
-              const row = gameboard.size - y + 1;
+              const row = gameboard.size - y + 2 - shipData.ship.length;
               shipEl.style.gridColumn = col;
               shipEl.style.gridRow = `${row} / span ${shipData.ship.length}`;
               shipEl.setAttribute("data-dir", "ver");

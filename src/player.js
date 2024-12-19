@@ -9,11 +9,40 @@ import {
 } from "./ship.js";
 
 export function createHumanPlayer(pname) {
-  return createPlayer("human", pname);
+  const player = createPlayer("human", pname);
+  const board = player.getBoard();
+
+  const carrier = new Carrier();
+  const battleship = new Battleship();
+  const destroyer = new Destroyer();
+  const submarine = new Submarine();
+  const patrolBoat = new PatrolBoat();
+  // initially we are hardcoding the locations of the ships
+  board.placeShip(patrolBoat, 4, 4, Gameboard.horizontal);
+  board.placeShip(destroyer, 7, 0, Gameboard.horizontal);
+  board.placeShip(submarine, 0, 9, Gameboard.horizontal);
+  board.placeShip(battleship, 0, 0, Gameboard.vertical);
+  board.placeShip(carrier, 9, 5, Gameboard.vertical);
+  return player;
 }
 
 export function createComputerPlayer() {
-  return createPlayer("computer", "Computer");
+  const computerPlayer = createPlayer("computer", "Computer");
+  const board = computerPlayer.getBoard();
+
+  const carrier = new Carrier();
+  const battleship = new Battleship();
+  const destroyer = new Destroyer();
+  const submarine = new Submarine();
+  const patrolBoat = new PatrolBoat();
+  // initially we are hardcoding the locations of the ships
+  // TODO randomize ship locations
+  board.placeShip(patrolBoat, 4, 4, Gameboard.horizontal);
+  board.placeShip(destroyer, 7, 0, Gameboard.horizontal);
+  board.placeShip(submarine, 0, 9, Gameboard.horizontal);
+  board.placeShip(battleship, 0, 0, Gameboard.vertical);
+  board.placeShip(carrier, 9, 5, Gameboard.vertical);
+  return computerPlayer;
 }
 
 /**
@@ -22,21 +51,9 @@ export function createComputerPlayer() {
  * @returns object
  */
 function createPlayer(type, pname) {
-  const carrier = new Carrier();
-  const battleship = new Battleship();
-  const destroyer = new Destroyer();
-  const submarine = new Submarine();
-  const patrolBoat = new PatrolBoat();
-
   const board = new Gameboard(type);
   const name = pname;
 
-  // initially we are hardcoding the locations of the ships
-  board.placeShip(patrolBoat, 4, 4, Gameboard.horizontal);
-  board.placeShip(destroyer, 7, 0, Gameboard.horizontal);
-  board.placeShip(submarine, 0, 9, Gameboard.horizontal);
-  board.placeShip(battleship, 0, 0, Gameboard.vertical);
-  board.placeShip(carrier, 9, 5, Gameboard.vertical);
   const getBoard = () => {
     return board;
   };

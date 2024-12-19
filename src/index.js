@@ -59,25 +59,72 @@ submitBtn.addEventListener("click", (event) => {
     }
   }
   if (valid) {
-    //start the game
-    const mainPlayer = createHumanPlayer(mainPlayerName.value); //always the human is the main player
-    const mainPlayerGridTitle = document.querySelector("#main-player-grid>h1");
-    mainPlayerGridTitle.innerText = `${mainPlayer.getName()}'s board`;
+    //setup the game boards
+    makePlayerGridDisplay();
+    const mainPlayerGrid = document.querySelector("#current-player-grid");
+
     const mainPlayerGridInstructions = document.querySelector(
-      "#main-player-grid>h2"
+      "#current-player-grid>.instructions"
     );
-    mainPlayerGridInstructions.innerText =
-      "Let's setup your board! Click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.";
-    const gridEl = document.querySelector("#main-player-grid>#grid");
-    formNewGrid(gridEl, mainPlayer);
+
+    const mainPlayer = createHumanPlayer(mainPlayerName.value); //always the human is the main player
+    const mainPlayerGridTitle = `<h1>${mainPlayer.getName()}'s board</h1>`;
+    /**
+     *         
+     * <h1></h1>
+        <h2></h2>
+        <p>Click "play" to lock the board and start the game.</p>
+        <input type="button" id="play" value="play" />
+     */
+    const mainPlayerGridSetupInstructions = `<h2>Let's setup your board! Click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.</h2>`;
+    const mainPlayerGridLockParagraph = `<p>Click "play" to lock the board and start the game.</p>`;
+    const mainPlayerGridLockButton = document.createElement("input");
+    mainPlayerGridLockButton.setAttribute("type", "button");
+    mainPlayerGridLockButton.setAttribute("id", "main-player");
+    mainPlayerGridLockButton.setAttribute("value", "play");
+    mainPlayerGridLockButton.addEventListener("click", (e) => {
+      play(e, mainPlayerGrid);
+    });
+    mainPlayerGridInstructions.innerHTML = mainPlayerGridTitle;
+    mainPlayerGridInstructions.innerHTML += mainPlayerGridSetupInstructions;
+    mainPlayerGridInstructions.innerHTML += mainPlayerGridLockParagraph;
+    mainPlayerGridInstructions.appendChild(mainPlayerGridLockButton);
+    const gridEl = document.querySelector("#current-player-grid>#grid");
+
+    displayShipsGrid(gridEl, mainPlayer);
     landingDialog.style.display = "none";
-    const mainPlayerGrid = document.querySelector("#main-player-grid");
 
     mainPlayerGrid.style.display = "inline-block";
   }
 });
 
-function formNewGrid(gridEl, currentPlayer) {
+function makePlayerGridDisplay() {
+  const parentEl = document.querySelector("#current-player-grid");
+  const instructionsEl = document.createElement("div");
+  instructionsEl.classList.add("instructions");
+  const gridEl = document.createElement("div");
+  gridEl.setAttribute("id", "grid");
+  parentEl.innerHTML = ""; //clear out the old elements
+  parentEl.appendChild(instructionsEl);
+  parentEl.appendChild(gridEl);
+}
+
+function play(e, currentDisplay) {
+  makePlayerGridDisplay();
+  console.log(e.target.id);
+  //we need to let the main player play if id is main-player
+  // if id is main-player-done then we show a splash with a button to allow next player to click and play
+  // if id is opp-player-done then we show a splash with a button to allow main player to click and play
+  // if opponent is computer we skip some steps
+  if (e.target.id === "main-player") {
+  }
+}
+
+function displayTargetGrid(gridEl, currentPlayer) {
+  const gameboard = currentPlayer.getBoard();
+}
+
+function displayShipsGrid(gridEl, currentPlayer) {
   const gameboard = currentPlayer.getBoard();
   const ships = gameboard.ships;
   let rowLabel = 0;

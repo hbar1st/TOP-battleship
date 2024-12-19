@@ -40,6 +40,9 @@ body {
   color: white;
 
   main {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
     margin-top: 5vh;
   }
 }
@@ -127,6 +130,8 @@ h1 > em {
   font-kerning: normal;
 }
 dialog {
+  grid-row: 1;
+  grid-column: 1;
   background: transparent;
   color: white;
   border: none;
@@ -182,6 +187,7 @@ fieldset {
   }
   #another-human:not(:checked) ~ #opp-name {
     transform: scale(1, 0);
+    transition: 0.2s all linear;
   }
   #opp-name {
     padding: 0.5rem;
@@ -192,6 +198,19 @@ fieldset {
   label:hover {
     text-shadow: 1px 0px whitesmoke;
   }
+}
+.hide {
+  transform: scale(1, 0);
+  transition: 0.5s all linear;
+}
+
+.show {
+  transform: scale(1);
+  transition: 0.5s all linear;
+}
+
+.pre-show {
+  transform: scale(1, 0);
 }
 
 button {
@@ -211,7 +230,8 @@ input:hover {
 }
 
 #current-player-grid {
-  display: none;
+  grid-row: 1;
+  grid-column: 1;
   width: min-content;
   background-color: #00bcd4;
   h2,

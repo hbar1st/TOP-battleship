@@ -49,7 +49,7 @@ submitBtn.addEventListener("click", (event) => {
   opponentChoices.forEach((el) => (el.checked ? (checkedId = el.id) : false));
   console.log(checkedId);
   if (checkedId === "the-computer") {
-    opponentPlayer = createComputerPlayer();
+    opponentPlayer = createComputerPlayer("opp-player");
   } else {
     //check name given
     const opponentName = document.querySelector("#opp-name");
@@ -59,12 +59,12 @@ submitBtn.addEventListener("click", (event) => {
       valid = false;
     } else {
       opponentName.setCustomValidity("");
-      opponentPlayer = createHumanPlayer(opponentName.value);
+      opponentPlayer = createHumanPlayer(opponentName.value, "opp-player");
     }
   }
   if (valid) {
     //setup the game boards
-    const mainPlayer = createHumanPlayer(mainPlayerName.value); //always the human is the main player
+    const mainPlayer = createHumanPlayer(mainPlayerName.value, "main-player"); //always the human is the main player
     setupPlayerShips(mainPlayer, mainPlayer, opponentPlayer);
   }
 });
@@ -90,9 +90,9 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   const playerGridLockButton = document.createElement("input");
   playerGridLockButton.setAttribute("type", "button");
   if (currentPlayer === mainPlayer) {
-    playerGridLockButton.setAttribute("id", currentPlayer.id); //allow opponent to do a ship setup
+    playerGridLockButton.setAttribute("id", currentPlayer.getId()); //allow opponent to do a ship setup
   } else {
-    playerGridLockButton.setAttribute("id", `${mainPlayer.id}-turn`); //switch turns
+    playerGridLockButton.setAttribute("id", `${mainPlayer.getId()}-turn`); //switch turns
   }
   playerGridLockButton.setAttribute("value", "play");
   if (isPlayerAComputer(opponentPlayer)) {
@@ -112,12 +112,18 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   playerGridInstructions.innerHTML += playerGridSetupInstructions;
   playerGridInstructions.innerHTML += playerGridLockParagraph;
   playerGridInstructions.appendChild(playerGridLockButton);
+  playerGrid.classList.add("pre-show"); //scales the element to hide it
   const gridEl = document.querySelector("#current-player-grid>#grid");
-
   displayShipsGrid(gridEl, currentPlayer);
-  landingDialog.style.display = "none";
+  landingDialog.classList.add("hide");
+  showElement(playerGrid);
+}
 
-  playerGrid.style.display = "inline-block";
+function showElement(el) {
+  setTimeout(() => {
+    el.classList.remove("pre-show");
+    el.classList.add("show");
+  }, 0);
 }
 
 function makePlayerGridDisplay() {

@@ -9,6 +9,9 @@ import {
 } from "./ship.js";
 
 export function createHumanPlayer(pname) {
+  if ( pname === "Computer") {
+    throw new Error("You can't call yourself Computer!");
+  }
   const player = createPlayer("human", pname);
   const board = player.getBoard();
 
@@ -24,6 +27,10 @@ export function createHumanPlayer(pname) {
   board.placeShip(battleship, 0, 0, Gameboard.vertical);
   board.placeShip(carrier, 9, 5, Gameboard.vertical);
   return player;
+}
+
+export function isPlayerAComputer(player) {
+  return player.getName() === "Computer";
 }
 
 export function createComputerPlayer() {

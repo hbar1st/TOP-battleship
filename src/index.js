@@ -2,7 +2,11 @@ import "./styles.css";
 import rotateIcon from "./rotate.svg";
 import moveIcon from "./move.svg";
 
-import { createHumanPlayer, createComputerPlayer } from "./player.js";
+import {
+  createHumanPlayer,
+  createComputerPlayer,
+  isPlayerAComputer,
+} from "./player.js";
 import { Gameboard } from "./gameboard.js";
 
 //create the main human player
@@ -83,7 +87,7 @@ submitBtn.addEventListener("click", (event) => {
     mainPlayerGridLockButton.setAttribute("id", "main-player");
     mainPlayerGridLockButton.setAttribute("value", "play");
     mainPlayerGridLockButton.addEventListener("click", (e) => {
-      play(e, mainPlayerGrid);
+      play(e, mainPlayer, opponentPlayer);
     });
     mainPlayerGridInstructions.innerHTML = mainPlayerGridTitle;
     mainPlayerGridInstructions.innerHTML += mainPlayerGridSetupInstructions;
@@ -109,19 +113,109 @@ function makePlayerGridDisplay() {
   parentEl.appendChild(gridEl);
 }
 
-function play(e, currentDisplay) {
+function play(e, mainPlayer, oppPlayer) {
   makePlayerGridDisplay();
+  const gridEl = document.querySelector("#current-player-grid>#grid");
+
+  const instructionsEl = document.querySelector(
+    "#current-player-grid>.instructions"
+  );
   console.log(e.target.id);
   //we need to let the main player play if id is main-player
   // if id is main-player-done then we show a splash with a button to allow next player to click and play
   // if id is opp-player-done then we show a splash with a button to allow main player to click and play
   // if opponent is computer we skip some steps
-  if (e.target.id === "main-player") {
+  const computerIsPlaying = isPlayerAComputer(oppPlayer);
+  let playerInstructions;
+  let nextButton;
+
+  if (
+    e.target.id === "main-player" ||
+    (e.target.id === "opp-player" && !computerIsPlaying)
+  ) {
+    playerInstructions = `<h1>${mainPlayer.getName()}'s Target board</h1><p>Clicking a cell will shoot a torpedo at that location.</p>`;
+    if (!computerIsPlaying) {
+      playerInstructions += `<p>After you're done click "next", then hand your device over to the other player.</p>`;
+    } else {
+      playerInstructions += `<p>After you're done click "next"</p>`;
+    }
+    nextButton = document.createElement("input");
+    nextButton.setAttribute("type", "button");
+    if (e.target.id === "main-player") {
+      computerIsPlaying
+        ? nextButton.setAttribute("id", "opp-player")
+        : nextButton.setAttribute("id", "opp-player-turn"); //to show a waiting screen
+    } else {
+      computerIsPlaying
+        ? nextButton.setAttribute("id", "main-player")
+        : nextButton.setAttribute("id", "main-player-turn"); //to show a waiting screen
+    }
+    nextButton.setAttribute("value", "next");
+    nextButton.addEventListener("click", (e) => {
+      play(e, mainPlayer, oppPlayer);
+    });
+    displayTargetGrid(gridEl, mainPlayer);
+  } else if (e.target.id === "opp-player" && isPlayerAComputer(oppPlayer)) {
+    //computer plays
+    console.log("Computer's turn!");
+  } else if (
+    e.target.id === "main-player-turn" ||
+    e.target.id === "opp-player-turn"
+  ) {
+    //display hold page with a button to allow players to hand each other the computer
   }
+  instructionsEl.innerHTML = playerInstructions;
+  instructionsEl.appendChild(nextButton);
 }
 
 function displayTargetGrid(gridEl, currentPlayer) {
   const gameboard = currentPlayer.getBoard();
+
+  let rowLabel = 0;
+  let colLabel = "A".charCodeAt(0);
+  let gridArr = []; // a grid array of divs
+
+  const fireEmoji = "🔥";
+  const waterEmoji = "💧";
+
+  //TODO handle misses and hits display!!
+  for (let i = 0; i < gameboard.size + 1; i++) {
+    const row = [];
+    for (let j = 0; j < gameboard.size + 1; j++) {
+      const div = document.createElement("div");
+      if (i === gameboard.size && j !== 0) {
+        div.innerText = rowLabel;
+        div.classList.add("label");
+        rowLabel++;
+      }
+      if (j === 0 && i < gameboard.size) {
+        div.innerText = String.fromCharCode(colLabel);
+        div.classList.add("label");
+        colLabel++;
+      }
+      if (j === 0 && i === gameboard.size) {
+        div.classList.add("label");
+      }
+      if (!div.classList.contains("label")) {
+        div.classList.add("cell");
+      }
+      row.push(div);
+    }
+    gridArr.push(row);
+  }
+  let mirrorboard = [];
+  for (let i = gameboard.size; i >= 0; i--) {
+    mirrorboard.push(gridArr[i]);
+  }
+
+  for (let i = 0; i < gameboard.size + 1; i++) {
+    for (let j = 0; j < gameboard.size + 1; j++) {
+      mirrorboard[i][j].style.gridRow = i + 1;
+      mirrorboard[i][j].style.gridColumn = j + 1;
+
+      gridEl.appendChild(mirrorboard[i][j]);
+    }
+  }
 }
 
 function displayShipsGrid(gridEl, currentPlayer) {

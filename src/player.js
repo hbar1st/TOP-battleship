@@ -8,11 +8,11 @@ import {
   Carrier,
 } from "./ship.js";
 
-export function createHumanPlayer(pname) {
-  if ( pname === "Computer") {
+export function createHumanPlayer(pname, id) {
+  if (pname === "Computer") {
     throw new Error("You can't call yourself Computer!");
   }
-  const player = createPlayer("human", pname);
+  const player = createPlayer("human", pname, id);
   const board = player.getBoard();
 
   const carrier = new Carrier();
@@ -33,8 +33,8 @@ export function isPlayerAComputer(player) {
   return player.getName() === "Computer";
 }
 
-export function createComputerPlayer() {
-  const computerPlayer = createPlayer("computer", "Computer");
+export function createComputerPlayer(id) {
+  const computerPlayer = createPlayer("computer", "Computer", id);
   const board = computerPlayer.getBoard();
 
   const carrier = new Carrier();
@@ -57,9 +57,10 @@ export function createComputerPlayer() {
  * @param {*} type can be human or computer
  * @returns object
  */
-function createPlayer(type, pname) {
+function createPlayer(type, pname, pid) {
   const board = new Gameboard(type);
   const name = pname;
+  const id = pid;
 
   const getBoard = () => {
     return board;
@@ -68,5 +69,9 @@ function createPlayer(type, pname) {
   const getName = () => {
     return name;
   };
-  return { getBoard, getName };
+
+  const getId = () => {
+    return id;
+  };
+  return { getBoard, getName, getId };
 }

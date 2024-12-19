@@ -64,43 +64,61 @@ submitBtn.addEventListener("click", (event) => {
   }
   if (valid) {
     //setup the game boards
-    makePlayerGridDisplay();
-    const mainPlayerGrid = document.querySelector("#current-player-grid");
-
-    const mainPlayerGridInstructions = document.querySelector(
-      "#current-player-grid>.instructions"
-    );
-
     const mainPlayer = createHumanPlayer(mainPlayerName.value); //always the human is the main player
-    const mainPlayerGridTitle = `<h1>${mainPlayer.getName()}'s board</h1>`;
-    /**
+    setupPlayerShips(mainPlayer, mainPlayer, opponentPlayer);
+  }
+});
+
+function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
+  makePlayerGridDisplay();
+  const playerGrid = document.querySelector("#current-player-grid");
+
+  const playerGridInstructions = document.querySelector(
+    "#current-player-grid>.instructions"
+  );
+
+  const playerGridTitle = `<h1>${mainPlayer.getName()}'s board</h1>`;
+  /**
      *         
      * <h1></h1>
         <h2></h2>
         <p>Click "play" to lock the board and start the game.</p>
         <input type="button" id="play" value="play" />
      */
-    const mainPlayerGridSetupInstructions = `<h2>Let's setup your board! Click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.</h2>`;
-    const mainPlayerGridLockParagraph = `<p>Click "play" to lock the board and start the game.</p>`;
-    const mainPlayerGridLockButton = document.createElement("input");
-    mainPlayerGridLockButton.setAttribute("type", "button");
-    mainPlayerGridLockButton.setAttribute("id", "main-player");
-    mainPlayerGridLockButton.setAttribute("value", "play");
-    mainPlayerGridLockButton.addEventListener("click", (e) => {
+  const playerGridSetupInstructions = `<h2>Let's setup your board! Click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.</h2>`;
+  const playerGridLockParagraph = `<p>Click "play" to lock the board and start the game.</p>`;
+  const playerGridLockButton = document.createElement("input");
+  playerGridLockButton.setAttribute("type", "button");
+  if (currentPlayer === mainPlayer) {
+    playerGridLockButton.setAttribute("id", currentPlayer.id); //allow opponent to do a ship setup
+  } else {
+    playerGridLockButton.setAttribute("id", `${mainPlayer.id}-turn`); //switch turns
+  }
+  playerGridLockButton.setAttribute("value", "play");
+  if (isPlayerAComputer(opponentPlayer)) {
+    playerGridLockButton.addEventListener("click", (e) => {
       play(e, mainPlayer, opponentPlayer);
     });
-    mainPlayerGridInstructions.innerHTML = mainPlayerGridTitle;
-    mainPlayerGridInstructions.innerHTML += mainPlayerGridSetupInstructions;
-    mainPlayerGridInstructions.innerHTML += mainPlayerGridLockParagraph;
-    mainPlayerGridInstructions.appendChild(mainPlayerGridLockButton);
-    const gridEl = document.querySelector("#current-player-grid>#grid");
-
-    displayShipsGrid(gridEl, mainPlayer);
-    landingDialog.style.display = "none";
-
-    mainPlayerGrid.style.display = "inline-block";
+  } else {
+    if (currentPlayer === mainPlayer) {
+      // allow the human opponent to setup their board!
+      playerGridLockButton.addEventListener("click", () => {
+        setupPlayerShips(opponentPlayer, mainPlayer, opponentPlayer);
+      });
+    } else {
+    }
   }
-});
+  playerGridInstructions.innerHTML = playerGridTitle;
+  playerGridInstructions.innerHTML += playerGridSetupInstructions;
+  playerGridInstructions.innerHTML += playerGridLockParagraph;
+  playerGridInstructions.appendChild(playerGridLockButton);
+  const gridEl = document.querySelector("#current-player-grid>#grid");
+
+  displayShipsGrid(gridEl, currentPlayer);
+  landingDialog.style.display = "none";
+
+  playerGrid.style.display = "inline-block";
+}
 
 function makePlayerGridDisplay() {
   const parentEl = document.querySelector("#current-player-grid");

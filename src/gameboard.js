@@ -86,8 +86,9 @@ export class Gameboard {
     //is (x,y) a hit?, which ship was hit?
     let hit = false;
     let shipIndex = 0;
+    let currShip;
     do {
-      let currShip = this.#ships[shipIndex];
+      currShip = this.#ships[shipIndex];
       let i = 0;
       do {
         if (
@@ -107,7 +108,7 @@ export class Gameboard {
 
     //record a list of hits and misses
     hit ? this.#addHit(x, y) : this.#addMiss(x, y);
-    return hit;
+    return hit ? currShip.ship : false;
   }
 
   allShipsSunk() {

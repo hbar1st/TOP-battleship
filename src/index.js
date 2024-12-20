@@ -162,9 +162,17 @@ function torpedo(e, gameboard, grid, handler) {
     !e.target.classList.contains("miss")
   ) {
     const xyPair = convertGridPairToCartesianPair(gameboard, row, col);
-    if (gameboard.receiveAttack(xyPair.x, xyPair.y)) {
+    const hitAShip = gameboard.receiveAttack(xyPair.x, xyPair.y);
+    if (hitAShip) {
       //show fire emoji in that spot
       e.target.classList.add("hit");
+      if (hitAShip.isSunk()) {
+        const shipEl = document.querySelector(
+          `#current-player-grid .${hitAShip.id}`
+        );
+        shipEl.classList.add("sunk");
+        shipEl.classList.remove("hidden");
+      }
     } else {
       //show water emoji in that spot
       e.target.classList.add("miss");
@@ -315,8 +323,6 @@ function play(e, mainPlayer, oppPlayer) {
 }
 
 function displayTargetGrid(gridEl, oppPlayer) {
-  //TODO display hits and misses
-
   console.log(
     "try to display the ",
     oppPlayer.getName(),
@@ -331,7 +337,13 @@ function displayTargetGrid(gridEl, oppPlayer) {
   let colLabel = "A".charCodeAt(0);
   let gridArr = []; // a grid array of divs
 
-  //TODO handle misses and hits display!!
+  //TODO display sunk ships
+  gameboard.ships.forEach((shipSpot) => {
+    const div = makeShipEl(shipSpot, oppPlayer, true);
+    div.classList.add("hidden");
+    gridEl.appendChild(div);
+  });
+
   for (let i = 0; i < gameboard.size + 1; i++) {
     const row = [];
     for (let j = 0; j < gameboard.size + 1; j++) {

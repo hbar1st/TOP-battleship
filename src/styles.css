@@ -469,3 +469,14 @@ details[open] {
 details {
   padding: 1rem 0 0 0;
 }
+
+.ship.sunk {
+  display: initial;
+  background: red;
+  z-index: -1;
+  box-shadow: 1px 1px 1px 1px rgb(228, 109, 77);
+}
+
+.ship.hidden {
+  display: none;
+}

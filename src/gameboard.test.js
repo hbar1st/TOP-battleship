@@ -139,7 +139,7 @@ describe("Gameboard Test", () => {
       Gameboard.vertical
     );
     expect(shipPlaced).toBe(true);
-    expect(gameboard.receiveAttack(6, 6)).toBe(true); //true means hit
+    expect(gameboard.receiveAttack(6, 6)).toBeInstanceOf(Ship); //true means hit
     expect(battleship.isSunk()).toBe(false);
   });
 
@@ -150,11 +150,13 @@ describe("Gameboard Test", () => {
   });
 
   test("Gameboard Registers That Patrol Boat Has Sunk After 2 Hits", () => {
-    expect(gameboard.receiveAttack(6, 7)).toBe(true); //true means hit
-    expect(gameboard.receiveAttack(6, 8)).toBe(true); //true means hit
+    const ship = gameboard.receiveAttack(6, 7);
+    expect(ship).toBeTruthy(); //true means hit
+    expect(gameboard.receiveAttack(6, 8)).toBeTruthy(); //true means hit
     expect(battleship.isSunk()).toBe(false);
-    expect(gameboard.receiveAttack(6, 9)).toBe(true); //true means hit
+    expect(gameboard.receiveAttack(6, 9)).toBeTruthy(); //true means hit
     expect(battleship.isSunk()).toBe(true);
+    expect(ship.isSunk()).toBe(true);
   });
 
   test("Gameboard Knows If All Ships Sank", () => {

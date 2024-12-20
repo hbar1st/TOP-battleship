@@ -360,10 +360,12 @@ div.cell {
 }
 div.cell.hit::before {
   content: "🔥";
+  z-index: 4;
 }
 div.cell.miss::before {
   content: "💧";
   background-color: #c1f0ff;
+  z-index: 4;
 }
 .hmargin {
   margin: 4px 3px;

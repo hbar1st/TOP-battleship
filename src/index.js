@@ -178,7 +178,7 @@ function torpedo(e, gameboard, grid, handler) {
       e.target.classList.add("miss");
     }
 
-    //TODO check if game is over?
+    //TODO check if game is over? and display both player's boards!!
     if (!gameboard.allShipsSunk()) {
       const nextBtn = document.querySelector(".instructions>input");
 
@@ -329,18 +329,19 @@ function displayTargetGrid(gridEl, oppPlayer) {
     "'s fleet hits/misses"
   );
   const gameboard = oppPlayer.getBoard();
-  const hits = gameboard.hits;
-  const misses = gameboard.misses;
-  console.log("hits: ", hits);
-  console.log("misses: ", misses);
+
   let rowLabel = 0;
   let colLabel = "A".charCodeAt(0);
   let gridArr = []; // a grid array of divs
 
-  //TODO display sunk ships
   gameboard.ships.forEach((shipSpot) => {
     const div = makeShipEl(shipSpot, oppPlayer, true);
-    div.classList.add("hidden");
+    if (shipSpot.ship.isSunk()) {
+      div.classList.add("sunk");
+      div.classList.remove("hidden");
+    } else {
+      div.classList.add("hidden");
+    }
     gridEl.appendChild(div);
   });
 
@@ -379,6 +380,10 @@ function displayTargetGrid(gridEl, oppPlayer) {
       mirrorboard[i][j].style.gridColumn = j + 1;
 
       if (mirrorboard[i][j].classList.contains("cell")) {
+        const hits = gameboard.hits;
+        const misses = gameboard.misses;
+        console.log("hits: ", hits);
+        console.log("misses: ", misses);
         const xyPair = convertGridPairToCartesianPair(gameboard, i + 1, j + 1);
         const missedPair = misses.filter(
           (el) => el.x === xyPair.x && el.y === xyPair.y
@@ -414,6 +419,9 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
 
   ships.forEach((shipSpot) => {
     const div = makeShipEl(shipSpot, currentPlayer, unresponsive);
+    if (shipSpot.ship.isSunk()) {
+      div.classList.add("sunk");
+    }
     gridEl.appendChild(div);
   });
 
@@ -534,7 +542,6 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
               shipEl.setAttribute("data-dir", "hor");
               shipEl.setAttribute("data-x1", x); //0-based col in ship array
               shipEl.setAttribute("data-y1", y); //0-based row in ship array
-              console.log("new shipEl: ", shipEl);
             }
           } else {
             let placed = false;
@@ -559,7 +566,6 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
               }
             } while (!placed && maxTries > 0);
             if (placed) {
-              console.log("shipData: ", shipData);
               shipData.x1 = x;
               shipData.y1 = y;
               const col = x + 2;
@@ -569,12 +575,25 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
               shipEl.setAttribute("data-dir", "ver");
               shipEl.setAttribute("data-x1", x); //0-based col in ship array
               shipEl.setAttribute("data-y1", y); //0-based row in ship array
-              console.log("new shipEl: ", shipEl);
             }
           }
-          console.log(shipData);
         });
       }
+
+      // TODO - start of refactor into function later
+      if (unresponsive && mirrorboard[i][j].classList.contains("cell")) {
+        const hits = gameboard.hits;
+        const misses = gameboard.misses;
+        const xyPair = convertGridPairToCartesianPair(gameboard, i + 1, j + 1);
+
+        const hitsPair = hits.filter(
+          (el) => el.x === xyPair.x && el.y === xyPair.y
+        );
+        if (hitsPair.length) {
+          mirrorboard[i][j].classList.add("hit");
+        }
+      }
+      // TODO - end of refactor this block into a function
       gridEl.appendChild(mirrorboard[i][j]);
     }
   }

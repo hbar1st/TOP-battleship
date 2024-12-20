@@ -34,7 +34,7 @@ export function isPlayerAComputer(player) {
 }
 
 export function createComputerPlayer(id) {
-  const computerPlayer = createPlayer("computer", "Computer", id);
+  const computerPlayer = createPlayer("computer", "The Computer", id);
   const board = computerPlayer.getBoard();
 
   const carrier = new Carrier();

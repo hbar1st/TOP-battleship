@@ -41,6 +41,7 @@ body {
 
   main {
     display: grid;
+    justify-items: center;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     margin-top: 5vh;
@@ -104,7 +105,8 @@ body {
   }
 }
 
-#landing-dialog::before {
+#landing-dialog::before,
+#end-game::before {
   content: "";
   align-self: center;
   justify-self: center;
@@ -125,8 +127,7 @@ body {
     transparent 17.5%
   );
   background-position: 0px, 0px;
-  /*position: absolute;
-top: calc(50px + 1vh);*/
+
   padding: 20px;
 }
 #circle {
@@ -195,7 +196,7 @@ h1 > em {
   font-kerning: normal;
 }
 
-dialog:not(#your-turn-dialog) {
+dialog#landing-dialog {
   grid-row: 1;
   grid-column: 1;
   background: transparent;
@@ -480,4 +481,55 @@ details {
 
 .ship.hidden {
   display: none;
+}
+
+#end-game {
+  grid-row: 1;
+  grid-column: 1;
+  z-index: 5;
+  background: repeating-conic-gradient(
+    from 0.25turn at 50% 50%,
+    #f69d3ce6,
+    10deg,
+    #0a762c99,
+    350deg,
+    #d4ffb3ba
+  );
+  display: none;
+  border-radius: 50%;
+  background-color: #0a762c99;
+  border: none;
+  color: white;
+  padding: 30px;
+  width: max-content;
+  aspect-ratio: 1;
+  height: auto;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+
+  div {
+    grid-row: 1;
+    grid-column: 1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  h1 {
+    font-size: max(3rem, 5vw);
+    color: white;
+  }
+
+  button {
+    letter-spacing: 0.05rem;
+    font-size: clamp(14px, 1.3rem, 2vw);
+    padding: 10px 0px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-variant-ligatures: none;
+    width: 70%;
+    align-self: center;
+    font-family: "macondo_swash_capsregular";
+  }
 }

@@ -1,5 +1,4 @@
 import "./styles.css";
-
 import {
   endGame,
   convertGridPairToCartesianPair,
@@ -178,7 +177,6 @@ function torpedo(e, gameboard, grid, handler) {
       e.target.classList.add("miss");
     }
 
-    //TODO check if game is over? and display both player's boards!!
     if (!gameboard.allShipsSunk()) {
       const nextBtn = document.querySelector(".instructions>input");
 
@@ -580,7 +578,6 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
         });
       }
 
-      // TODO - start of refactor into function later
       if (unresponsive && mirrorboard[i][j].classList.contains("cell")) {
         const hits = gameboard.hits;
         const misses = gameboard.misses;
@@ -593,7 +590,6 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
           mirrorboard[i][j].classList.add("hit");
         }
       }
-      // TODO - end of refactor this block into a function
       gridEl.appendChild(mirrorboard[i][j]);
     }
   }

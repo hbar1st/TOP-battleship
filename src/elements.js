@@ -1,5 +1,7 @@
 import rotateIcon from "./rotate.svg";
 import moveIcon from "./move.svg";
+import { isPlayerAComputer } from "./player.js";
+
 export {
   convertGridPairToCartesianPair,
   showElement,
@@ -159,5 +161,22 @@ function rotateShip(e, currentPlayer) {
 }
 
 function endGame(winner, loser) {
-  alert(`${winner.getName()}, you've won! Sorry about that ${loser.getName()}`);
+  if (isPlayerAComputer(winner)) {
+    setTimeout(() => {
+      alert(`The Computer has won! Sorry about that ${loser.getName()}!`);
+    }, 10);
+  } else {
+    const winnerDiv = document.querySelector("#end-game");
+    const winnerName = document.querySelector("#winner-name");
+    const playbutton = document.querySelector("#play-again");
+    const hidebutton = document.querySelector("#hide-pane");
+    playbutton.addEventListener("click", () => {
+      location.reload();
+    });
+    hidebutton.addEventListener("click", () => {
+      winnerDiv.style.display = "none";
+    });
+    winnerName.innerText = `${winner.getName()}`;
+    winnerDiv.style.display = "grid";
+  }
 }

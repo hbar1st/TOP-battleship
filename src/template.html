@@ -7,6 +7,13 @@
   </head>
   <body>
     <main>
+      <div id="end-game">
+        <div>
+          <h1>Congratulations <span id="winner-name"></span>, you won!</h1>
+          <button type="button" id="play-again">Play Again!</button>
+          <button type="button" id="hide-pane">Hide this message.</button>
+        </div>
+      </div>
       <div id="current-player-grid"></div>
       <div id="fleet-status" class="pre-show">
         <!--<h3>Hits Scored Against Your Fleet:</h3>
@@ -17,7 +24,7 @@
         <p>Patrol Boat: <span class="hit-score">0</span><span>/2</span></p>-->
       </div>
       <dialog open id="landing-dialog">
-        <div id="circle">
+        <div class="circle" id="circle">
           <header>
             <h1>It's time to play <em>BATTLESHIP!</em></h1>
           </header>

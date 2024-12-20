@@ -74,12 +74,9 @@ submitBtn.addEventListener("click", (event) => {
 });
 
 function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
-  makePlayerGridDisplay();
   const playerGrid = document.querySelector("#current-player-grid");
 
-  const playerGridInstructions = document.querySelector(
-    "#current-player-grid>.instructions"
-  );
+  const playerGridInstructions = makePlayerGridDisplay(playerGrid);
 
   const playerGridTitle = `<h1>${currentPlayer.getName()}'s board</h1>`;
   /**
@@ -107,7 +104,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
     if (currentPlayer === mainPlayer) {
       // allow the human opponent to setup their board!
       playerGridLockButton.addEventListener("click", () => {
-        playerGrid.classList.remove("show");
+        playerGrid.classList.remove("show", "pre-show");
         playerGrid.classList.add("hide");
         setTimeout(() => {
           setupPlayerShips(opponentPlayer, mainPlayer, opponentPlayer);
@@ -130,13 +127,15 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   showElement(playerGrid);
 }
 
-function makePlayerGridDisplay() {
-  const parentEl = document.querySelector("#current-player-grid");
+function makePlayerGridDisplay(parentEl) {
+  parentEl.classList.add("pre-show");
+  parentEl.classList.remove("show", "hide");
   const instructionsEl = document.createElement("div");
   instructionsEl.classList.add("instructions");
   parentEl.innerHTML = ""; //clear out the old elements
   parentEl.appendChild(instructionsEl);
   addGridEl(parentEl);
+  return instructionsEl;
 }
 
 function addGridEl(parentEl) {
@@ -146,9 +145,14 @@ function addGridEl(parentEl) {
   return gridEl;
 }
 
+/**
+ *
+ * @param {*} e
+ * @param {*} gameboard the target board (of whoever is not the currentPlayer)
+ * @param {*} grid the #grid element used for targetting
+ * @param {*} handler the listener for torpedos
+ */
 function torpedo(e, gameboard, grid, handler) {
-  console.log(handler);
-  console.log(grid);
   const row = e.target.style.gridRow;
   const col = e.target.style.gridColumn;
   if (
@@ -157,7 +161,6 @@ function torpedo(e, gameboard, grid, handler) {
     !e.target.classList.contains("miss")
   ) {
     const xyPair = convertGridPairToCartesianPair(gameboard, row, col);
-    console.log(xyPair);
     if (gameboard.receiveAttack(xyPair.x, xyPair.y)) {
       //show fire emoji in that spot
       //const spanEl = document.createElement("span");
@@ -177,22 +180,47 @@ function torpedo(e, gameboard, grid, handler) {
 }
 
 function play(e, mainPlayer, oppPlayer) {
-  makePlayerGridDisplay();
-  const fleetStatusEl = document.querySelector("#fleet-status");
-  const currentPlayer = e.target.id === "main-player" ? mainPlayer : oppPlayer;
   const parentEl = document.querySelector("#current-player-grid");
+  const instructionsEl = makePlayerGridDisplay(parentEl);
+
+  const fleetStatusEl = document.querySelector("#fleet-status");
+  let currentPlayer;
+  if (e.target.id === "main-player") {
+    currentPlayer = mainPlayer;
+  } else if (e.target.id === "opp-player") {
+    currentPlayer = oppPlayer;
+  } else if (e.target.id === "main-player-turn") {
+    currentPlayer = mainPlayer;
+  } else {
+    currentPlayer = oppPlayer;
+  }
+  console.log("e.target.id = ", e.target.id);
+  console.log("currentPlayer = ", currentPlayer.getName());
 
   function throwATorpedo(e) {
-    torpedo(e, oppPlayer.getBoard(), parentEl, throwATorpedo);
+    console.log(`${currentPlayer.getName()} throws a torpedo at ?`);
+    currentPlayer === mainPlayer
+      ? console.log(`${oppPlayer.getName()}`)
+      : console.log(`${mainPlayer.getName()}`);
+
+    torpedo(
+      e,
+      currentPlayer === mainPlayer
+        ? oppPlayer.getBoard()
+        : mainPlayer.getBoard(),
+      parentEl,
+      throwATorpedo
+    );
   }
 
   if (e.target.id !== "main-player-turn" && e.target.id !== "opp-player-turn") {
     parentEl.classList.add("pre-show"); //scales the element to hide it
+    parentEl.removeEventListener("click", throwATorpedo);
     parentEl.addEventListener("click", throwATorpedo); //send opponent's board to be targeted
     showElement(parentEl);
     fleetStatusEl.classList.add("pre-show");
     fleetStatusEl.innerHTML = ""; //clear out the old elements
-    fleetStatusEl.innerHTML = "<h3>Your Fleet Board</h3>";
+    fleetStatusEl.innerHTML = "<h3>Your Fleet Status</h3>";
     displayShipsGrid(addGridEl(fleetStatusEl), currentPlayer, true);
     showElement(fleetStatusEl);
   } else {
@@ -203,10 +231,6 @@ function play(e, mainPlayer, oppPlayer) {
   }
   const gridEl = document.querySelector("#current-player-grid>#grid");
 
-  const instructionsEl = document.querySelector(
-    "#current-player-grid>.instructions"
-  );
-  console.log(e.target.id);
   //we need to let the main player play if id is main-player
   // if id is main-player-done then we show a splash with a button to allow next player to click and play
   // if id is opp-player-done then we show a splash with a button to allow main player to click and play
@@ -237,14 +261,12 @@ function play(e, mainPlayer, oppPlayer) {
         : nextButton.setAttribute("id", "main-player-turn"); //to show a waiting screen
     }
     nextButton.setAttribute("value", "next");
-    nextButton.setAttribute(
-      "id",
-      e.target.id === "main-player" ? "opp-player-turn" : "main-player-turn"
-    );
     nextButton.addEventListener("click", (e) => {
       play(e, mainPlayer, oppPlayer);
     });
-    displayTargetGrid(gridEl, mainPlayer);
+    currentPlayer === mainPlayer
+      ? displayTargetGrid(gridEl, oppPlayer)
+      : displayTargetGrid(gridEl, mainPlayer);
   } else if (e.target.id === "opp-player" && isPlayerAComputer(oppPlayer)) {
     //computer plays
     console.log("Computer's turn!");
@@ -253,6 +275,8 @@ function play(e, mainPlayer, oppPlayer) {
     e.target.id === "opp-player-turn"
   ) {
     //display hold page with a button to allow players to hand each other the computer
+    //
+    //<button type="button">Let's go!</button>
     const yourTurnDialog = document.querySelector("#your-turn-dialog");
     const yourTurnDialogBtn = document.querySelector(
       "#your-turn-dialog>div>button"
@@ -264,10 +288,14 @@ function play(e, mainPlayer, oppPlayer) {
     }
     const playerNameEl = document.querySelector("#player-name");
     playerNameEl.innerText = `${currentPlayer.getName()}`;
-    yourTurnDialogBtn.addEventListener("click", (e) => {
+
+    function nextTurn(e) {
       yourTurnDialog.close();
       play(e, mainPlayer, oppPlayer);
-    });
+      yourTurnDialogBtn.removeEventListener("click", nextTurn);
+    }
+
+    yourTurnDialogBtn.addEventListener("click", nextTurn);
 
     yourTurnDialog.showModal();
     const dialogDivs = document.querySelectorAll("#your-turn-dialog>div>*");
@@ -276,17 +304,24 @@ function play(e, mainPlayer, oppPlayer) {
   instructionsEl.innerHTML = playerInstructions;
   if (nextButton) {
     nextButton.classList.add("hide");
-    nextButton.classList.remove("show");
-    nextButton.classList.remove("pre-show");
+    nextButton.classList.remove("show", "pre-show");
     instructionsEl.appendChild(nextButton);
   }
-
-  //display a summary of hits against the fleet
 }
 
-function displayTargetGrid(gridEl, currentPlayer) {
-  const gameboard = currentPlayer.getBoard();
+function displayTargetGrid(gridEl, oppPlayer) {
+  //TODO display hits and misses
 
+  console.log(
+    "try to display the ",
+    oppPlayer.getName(),
+    "'s fleet hits/misses"
+  );
+  const gameboard = oppPlayer.getBoard();
+  const hits = gameboard.hits;
+  const misses = gameboard.misses;
+  console.log("hits: ", hits);
+  console.log("misses: ", misses);
   let rowLabel = 0;
   let colLabel = "A".charCodeAt(0);
   let gridArr = []; // a grid array of divs
@@ -326,6 +361,22 @@ function displayTargetGrid(gridEl, currentPlayer) {
       mirrorboard[i][j].style.gridRow = i + 1;
       mirrorboard[i][j].style.gridColumn = j + 1;
 
+      if (mirrorboard[i][j].classList.contains("cell")) {
+        const xyPair = convertGridPairToCartesianPair(gameboard, i + 1, j + 1);
+        const missedPair = misses.filter(
+          (el) => el.x === xyPair.x && el.y === xyPair.y
+        );
+
+        const hitsPair = hits.filter(
+          (el) => el.x === xyPair.x && el.y === xyPair.y
+        );
+
+        if (missedPair.length) {
+          mirrorboard[i][j].classList.add("miss");
+        } else if (hitsPair.length) {
+          mirrorboard[i][j].classList.add("hit");
+        }
+      }
       gridEl.appendChild(mirrorboard[i][j]);
     }
   }

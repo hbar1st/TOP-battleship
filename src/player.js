@@ -30,7 +30,7 @@ export function createHumanPlayer(pname, id) {
 }
 
 export function isPlayerAComputer(player) {
-  return player.getName() === "Computer";
+  return player.getName() === "The Computer";
 }
 
 export function createComputerPlayer(id) {

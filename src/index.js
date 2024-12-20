@@ -73,6 +73,12 @@ submitBtn.addEventListener("click", (event) => {
   }
 });
 
+/**
+ *
+ * @param {*} currentPlayer whichever player who's turn it is
+ * @param {*} mainPlayer this will always be a human
+ * @param {*} opponentPlayer this can be a human or a computer
+ */
 function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   const playerGrid = document.querySelector("#current-player-grid");
 
@@ -96,13 +102,17 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
     playerGridLockButton.setAttribute("id", `${mainPlayer.getId()}-turn`); //switch turns
   }
   playerGridLockButton.setAttribute("value", "play");
+
+  function handlePlay(e) {
+    playerGridLockButton.removeEventListener("click", handlePlay);
+    play(e, mainPlayer, opponentPlayer);
+  }
+
   if (isPlayerAComputer(opponentPlayer)) {
-    playerGridLockButton.addEventListener("click", (e) => {
-      play(e, mainPlayer, opponentPlayer);
-    });
+    playerGridLockButton.addEventListener("click", handlePlay);
   } else {
     if (currentPlayer === mainPlayer) {
-      // allow the human opponent to setup their board!
+      // allow the other human opponent to setup their board!
       playerGridLockButton.addEventListener("click", () => {
         playerGrid.classList.remove("show", "pre-show");
         playerGrid.classList.add("hide");
@@ -111,9 +121,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
         }, 500);
       });
     } else {
-      playerGridLockButton.addEventListener("click", (e) => {
-        play(e, mainPlayer, opponentPlayer);
-      });
+      playerGridLockButton.addEventListener("click", handlePlay);
     }
   }
   playerGridInstructions.innerHTML = playerGridTitle;
@@ -189,6 +197,7 @@ function torpedo(e, gameboard, grid, handler) {
 
 function play(e, mainPlayer, oppPlayer) {
   const parentEl = document.querySelector("#current-player-grid");
+  const gridEl = document.querySelector("#grid");
   const instructionsEl = makePlayerGridDisplay(parentEl);
 
   const fleetStatusEl = document.querySelector("#fleet-status");
@@ -217,6 +226,7 @@ function play(e, mainPlayer, oppPlayer) {
         ? oppPlayer.getBoard()
         : mainPlayer.getBoard();
 
+    const parentEl = document.querySelector("#current-player-grid");
     torpedo(e, targetBoard, parentEl, throwATorpedo);
 
     if (targetBoard.allShipsSunk()) {
@@ -226,8 +236,8 @@ function play(e, mainPlayer, oppPlayer) {
 
   if (e.target.id !== "main-player-turn" && e.target.id !== "opp-player-turn") {
     parentEl.classList.add("pre-show"); //scales the element to hide it
-    parentEl.removeEventListener("click", throwATorpedo);
-    parentEl.addEventListener("click", throwATorpedo); //send opponent's board to be targeted
+    gridEl.removeEventListener("click", throwATorpedo);
+    gridEl.addEventListener("click", throwATorpedo); //send opponent's board to be targeted
     showElement(parentEl);
     fleetStatusEl.classList.add("pre-show");
     fleetStatusEl.innerHTML = ""; //clear out the old elements
@@ -240,7 +250,6 @@ function play(e, mainPlayer, oppPlayer) {
     parentEl.classList.add("hide");
     fleetStatusEl.classList.add("hide");
   }
-  const gridEl = document.querySelector("#current-player-grid>#grid");
 
   //we need to let the main player play if id is main-player
   // if id is main-player-done then we show a splash with a button to allow next player to click and play
@@ -380,8 +389,6 @@ function displayTargetGrid(gridEl, oppPlayer) {
       if (mirrorboard[i][j].classList.contains("cell")) {
         const hits = gameboard.hits;
         const misses = gameboard.misses;
-        console.log("hits: ", hits);
-        console.log("misses: ", misses);
         const xyPair = convertGridPairToCartesianPair(gameboard, i + 1, j + 1);
         const missedPair = misses.filter(
           (el) => el.x === xyPair.x && el.y === xyPair.y
@@ -460,28 +467,16 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
 
       if (!unresponsive && !mirrorboard[i][j].classList.contains("label")) {
         mirrorboard[i][j].addEventListener("dragenter", (e) => {
-          console.log("dragenter: ", e.target);
           e.preventDefault();
         });
         mirrorboard[i][j].addEventListener("dragover", (e) => {
-          console.log("dragover: ", e.target.style.gridArea);
           e.preventDefault();
         });
         mirrorboard[i][j].addEventListener("drop", (e) => {
-          console.log("drop: ", e.target);
           const row = e.target.style.gridRowStart;
           const col = e.target.style.gridColumnStart;
           const id = e.dataTransfer.getData("text/plain");
           const mouseLoc = e.dataTransfer.getData("mouseLoc");
-          console.log(
-            "dataTransfer: ",
-            id,
-            "mouseLoc: ",
-            mouseLoc,
-            "target row/col: ",
-            row,
-            col
-          );
           //find out if the locations we are dropping into are free
           let x1 = Number(col);
           let y1 = Number(row);
@@ -580,7 +575,6 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
 
       if (unresponsive && mirrorboard[i][j].classList.contains("cell")) {
         const hits = gameboard.hits;
-        const misses = gameboard.misses;
         const xyPair = convertGridPairToCartesianPair(gameboard, i + 1, j + 1);
 
         const hitsPair = hits.filter(
@@ -594,5 +588,5 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
     }
   }
 
-  console.log(gameboard.getBoardArray());
+  //console.log(gameboard.getBoardArray());
 }

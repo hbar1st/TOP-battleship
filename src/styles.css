@@ -353,14 +353,13 @@ div#grid {
 
 div.cell {
   border: 2px outset black;
-  font-size: 1.3rem;
+  font-size: clamp(1.3rem, max(min(3.3vw, 3.3vh), 26px), 1.6rem);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 div.cell.hit::before {
   content: "🔥";
-  background-color: #3b8ea7;
 }
 div.cell.miss::before {
   content: "💧";
@@ -472,9 +471,9 @@ details {
 
 .ship.sunk {
   display: initial;
-  background: red;
-  z-index: -1;
+  background: #ff000029;
   box-shadow: 1px 1px 1px 1px rgb(228, 109, 77);
+  border-color: red;
 }
 
 .ship.hidden {

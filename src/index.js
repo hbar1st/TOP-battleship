@@ -1,6 +1,7 @@
 import "./styles.css";
 
 import {
+  endGame,
   convertGridPairToCartesianPair,
   showElement,
   staggeredShowElement,
@@ -163,19 +164,20 @@ function torpedo(e, gameboard, grid, handler) {
     const xyPair = convertGridPairToCartesianPair(gameboard, row, col);
     if (gameboard.receiveAttack(xyPair.x, xyPair.y)) {
       //show fire emoji in that spot
-      //const spanEl = document.createElement("span");
-      e.target.classList.add("hit"); //innerText = "&#57629;"; ///"\ue11d"
+      e.target.classList.add("hit");
     } else {
       //show water emoji in that spot
-      //const spanEl = document.createElement("span");
-      e.target.classList.add("miss"); //innerText = "&#x1f4a7;"; //"\u1f4a7"
+      e.target.classList.add("miss");
     }
 
-    const nextBtn = document.querySelector(".instructions>input");
+    //TODO check if game is over?
+    if (!gameboard.allShipsSunk()) {
+      const nextBtn = document.querySelector(".instructions>input");
 
-    nextBtn.classList.remove("hide");
-    nextBtn.classList.add("show");
-    grid.removeEventListener("click", handler);
+      nextBtn.classList.remove("hide");
+      nextBtn.classList.add("show");
+      grid.removeEventListener("click", handler);
+    }
   }
 }
 
@@ -199,18 +201,21 @@ function play(e, mainPlayer, oppPlayer) {
 
   function throwATorpedo(e) {
     console.log(`${currentPlayer.getName()} throws a torpedo at ?`);
+
     currentPlayer === mainPlayer
       ? console.log(`${oppPlayer.getName()}`)
       : console.log(`${mainPlayer.getName()}`);
 
-    torpedo(
-      e,
+    const targetBoard =
       currentPlayer === mainPlayer
         ? oppPlayer.getBoard()
-        : mainPlayer.getBoard(),
-      parentEl,
-      throwATorpedo
-    );
+        : mainPlayer.getBoard();
+
+    torpedo(e, targetBoard, parentEl, throwATorpedo);
+
+    if (targetBoard.allShipsSunk()) {
+      endGame(currentPlayer, oppPlayer);
+    }
   }
 
   if (e.target.id !== "main-player-turn" && e.target.id !== "opp-player-turn") {
@@ -243,11 +248,11 @@ function play(e, mainPlayer, oppPlayer) {
     e.target.id === "main-player" ||
     (e.target.id === "opp-player" && !computerIsPlaying)
   ) {
-    playerInstructions = `<h1>${currentPlayer.getName()}'s Target board</h1><p>Clicking a cell will shoot a torpedo at that location.</p>`;
+    playerInstructions = `<h1>${currentPlayer.getName()}'s Target board</h1><details><summary>Instructions</summary><p>Clicking a cell will shoot a torpedo at that location.</p>`;
     if (!computerIsPlaying) {
-      playerInstructions += `<p>After you're done click "next", then hand your device over to the other player.</p>`;
+      playerInstructions += `<p>After you're done click "next", then hand your device over to the other player.</p></details>`;
     } else {
-      playerInstructions += `<p>After you're done click "next"</p>`;
+      playerInstructions += `<p>After you're done click "next"</p></details>`;
     }
     nextButton = document.createElement("input");
     nextButton.setAttribute("type", "button");

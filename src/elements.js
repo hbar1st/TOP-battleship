@@ -6,6 +6,7 @@ export {
   staggeredShowElement,
   makeShipEl,
   createRotationImg,
+  endGame,
 };
 
 import { Gameboard } from "./gameboard.js";
@@ -155,4 +156,8 @@ function rotateShip(e, currentPlayer) {
     rotatedShipEl.appendChild(rotateImg);
     shipEl.parentElement.replaceChild(rotatedShipEl, shipEl);
   }
+}
+
+function endGame(winner, loser) {
+  alert(`${winner.getName()}, you've won! Sorry about that ${loser.getName()}`);
 }

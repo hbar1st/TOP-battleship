@@ -266,17 +266,17 @@ fieldset {
   }
 }
 .hide {
-  transform: scale(1, 0);
+  transform: scale(var(--scaleX, 1), var(--scaleY, 0));
   transition: 0.5s all linear;
 }
 
 .show {
-  transform: scale(1);
+  transform: scale(var(--scaleX, 1), var(--scaleY, 1));
   transition: 0.5s all linear;
 }
 
 .pre-show {
-  transform: scale(1, 0);
+  transform: scale(var(--scaleX, 1), var(--scaleY, 0));
 }
 
 button {
@@ -451,10 +451,21 @@ div.cell.miss::before {
   border: 3px dashed #c0fffe;
 
   margin-top: 3px;
-
   h3 {
     font-size: 1.5rem;
     padding: 1rem;
     text-align: center;
   }
+}
+#fleet-status:not(.hide) {
+  --scaleX: 0.7;
+  --scaleY: 0.7;
+  transform: scale(var(--scaleX), var(--scaleY));
+}
+
+details[open] {
+  padding: 1rem;
+}
+details {
+  padding: 1rem 0 0 0;
 }

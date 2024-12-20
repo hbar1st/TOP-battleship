@@ -1,6 +1,11 @@
 import "./styles.css";
 
-import { showElement, staggeredShowElement, makeShipEl } from "./elements.js";
+import {
+  convertGridPairToCartesianPair,
+  showElement,
+  staggeredShowElement,
+  makeShipEl,
+} from "./elements.js";
 
 import {
   createHumanPlayer,
@@ -141,10 +146,34 @@ function addGridEl(parentEl) {
   return gridEl;
 }
 
-function torpedo(e) {
-  console.log(e.target);
-  console.log(e.target.classList);
-  console.log(e.target.gridArea);
+function torpedo(e, gameboard, grid, handler) {
+  console.log(handler);
+  console.log(grid);
+  const row = e.target.style.gridRow;
+  const col = e.target.style.gridColumn;
+  if (
+    e.target.classList.contains("cell") &&
+    !e.target.classList.contains("hit") &&
+    !e.target.classList.contains("miss")
+  ) {
+    const xyPair = convertGridPairToCartesianPair(gameboard, row, col);
+    console.log(xyPair);
+    if (gameboard.receiveAttack(xyPair.x, xyPair.y)) {
+      //show fire emoji in that spot
+      //const spanEl = document.createElement("span");
+      e.target.classList.add("hit"); //innerText = "&#57629;"; ///"\ue11d"
+    } else {
+      //show water emoji in that spot
+      //const spanEl = document.createElement("span");
+      e.target.classList.add("miss"); //innerText = "&#x1f4a7;"; //"\u1f4a7"
+    }
+
+    const nextBtn = document.querySelector(".instructions>input");
+
+    nextBtn.classList.remove("hide");
+    nextBtn.classList.add("show");
+    grid.removeEventListener("click", handler);
+  }
 }
 
 function play(e, mainPlayer, oppPlayer) {
@@ -152,9 +181,14 @@ function play(e, mainPlayer, oppPlayer) {
   const fleetStatusEl = document.querySelector("#fleet-status");
   const currentPlayer = e.target.id === "main-player" ? mainPlayer : oppPlayer;
   const parentEl = document.querySelector("#current-player-grid");
+
+  function throwATorpedo(e) {
+    torpedo(e, oppPlayer.getBoard(), parentEl, throwATorpedo);
+  }
+
   if (e.target.id !== "main-player-turn" && e.target.id !== "opp-player-turn") {
     parentEl.classList.add("pre-show"); //scales the element to hide it
-    parentEl.addEventListener("click", torpedo);
+    parentEl.addEventListener("click", throwATorpedo); //send opponent's board to be targeted
     showElement(parentEl);
     fleetStatusEl.classList.add("pre-show");
     fleetStatusEl.innerHTML = ""; //clear out the old elements
@@ -203,6 +237,10 @@ function play(e, mainPlayer, oppPlayer) {
         : nextButton.setAttribute("id", "main-player-turn"); //to show a waiting screen
     }
     nextButton.setAttribute("value", "next");
+    nextButton.setAttribute(
+      "id",
+      e.target.id === "main-player" ? "opp-player-turn" : "main-player-turn"
+    );
     nextButton.addEventListener("click", (e) => {
       play(e, mainPlayer, oppPlayer);
     });
@@ -225,7 +263,7 @@ function play(e, mainPlayer, oppPlayer) {
       yourTurnDialogBtn.setAttribute("id", "opp-player");
     }
     const playerNameEl = document.querySelector("#player-name");
-    playerNameEl.innerText = `${mainPlayer.getName()}`;
+    playerNameEl.innerText = `${currentPlayer.getName()}`;
     yourTurnDialogBtn.addEventListener("click", (e) => {
       yourTurnDialog.close();
       play(e, mainPlayer, oppPlayer);
@@ -237,6 +275,9 @@ function play(e, mainPlayer, oppPlayer) {
   }
   instructionsEl.innerHTML = playerInstructions;
   if (nextButton) {
+    nextButton.classList.add("hide");
+    nextButton.classList.remove("show");
+    nextButton.classList.remove("pre-show");
     instructionsEl.appendChild(nextButton);
   }
 
@@ -249,9 +290,6 @@ function displayTargetGrid(gridEl, currentPlayer) {
   let rowLabel = 0;
   let colLabel = "A".charCodeAt(0);
   let gridArr = []; // a grid array of divs
-
-  const fireEmoji = "🔥";
-  const waterEmoji = "💧";
 
   //TODO handle misses and hits display!!
   for (let i = 0; i < gameboard.size + 1; i++) {

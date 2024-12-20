@@ -1,6 +1,12 @@
 import rotateIcon from "./rotate.svg";
 import moveIcon from "./move.svg";
-export { showElement, staggeredShowElement, makeShipEl, createRotationImg };
+export {
+  convertGridPairToCartesianPair,
+  showElement,
+  staggeredShowElement,
+  makeShipEl,
+  createRotationImg,
+};
 
 import { Gameboard } from "./gameboard.js";
 
@@ -47,6 +53,13 @@ function makeShipEl(shipSpot, currentPlayer, unresponsive) {
     div.classList.add("hmargin");
   }
   return div;
+}
+
+function convertGridPairToCartesianPair(gameboard, row, col) {
+  let res = { x: 0, y: 0 };
+  res.x = col - 2;
+  res.y = gameboard.size - row + 1;
+  return res;
 }
 
 function createRotationImg(currentPlayer) {

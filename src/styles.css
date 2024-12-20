@@ -72,7 +72,7 @@ body {
     box-shadow: 0px 2px 3px 1px rgb(107, 76, 5);
   }
   div:first-child.show {
-    transform: scale(1) skew(1deg, 2deg);
+    transform: scale(1) skew(-1deg, 0deg);
   }
   div:nth-child(2).show {
     transform: scale(1) skew(2deg, 1deg);
@@ -301,6 +301,7 @@ input:hover {
   grid-column: 1;
   width: min-content;
   background-color: #00bcd4;
+
   h2,
   p,
   input {
@@ -315,13 +316,17 @@ input:hover {
     margin-top: 5px;
   }
   input {
+    width: 90%;
     padding: 2px 7px;
     letter-spacing: 1px;
     border-radius: 5px;
     font-family: "macondo_swash_capsregular";
   }
-  #instructions {
+  .instructions {
     background-color: #100d39;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
@@ -348,6 +353,18 @@ div#grid {
 
 div.cell {
   border: 2px outset black;
+  font-size: 1.3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+div.cell.hit::before {
+  content: "🔥";
+  background-color: #3b8ea7;
+}
+div.cell.miss::before {
+  content: "💧";
+  background-color: #c1f0ff;
 }
 .hmargin {
   margin: 4px 3px;

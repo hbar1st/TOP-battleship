@@ -1,4 +1,7 @@
 import "./styles.css";
+import torpedoHit from "./torpedo-hits-ship.gif";
+import torpedoMisses from "./torpedo-misses-ship.gif";
+
 import {
   endGame,
   convertGridPairToCartesianPair,
@@ -104,12 +107,11 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   playerGridLockButton.setAttribute("value", "play");
 
   function handlePlay(e) {
-    playerGridLockButton.removeEventListener("click", handlePlay);
     play(e, mainPlayer, opponentPlayer);
   }
 
   if (isPlayerAComputer(opponentPlayer)) {
-    playerGridLockButton.addEventListener("click", handlePlay);
+    playerGridLockButton.addEventListener("click", handlePlay, once);
   } else {
     if (currentPlayer === mainPlayer) {
       // allow the other human opponent to setup their board!
@@ -121,7 +123,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
         }, 500);
       });
     } else {
-      playerGridLockButton.addEventListener("click", handlePlay);
+      playerGridLockButton.addEventListener("click", handlePlay, once);
     }
   }
   playerGridInstructions.innerHTML = playerGridTitle;
@@ -129,7 +131,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   playerGridInstructions.innerHTML += playerGridLockParagraph;
   playerGridInstructions.appendChild(playerGridLockButton);
   playerGrid.classList.add("pre-show"); //scales the element to hide it
-  const gridEl = document.querySelector("#current-player-grid>#grid");
+  const gridEl = document.querySelector("#current-player-grid .grid");
   displayShipsGrid(gridEl, currentPlayer);
   landingDialog.classList.add("hide");
   showElement(playerGrid);
@@ -148,7 +150,7 @@ function makePlayerGridDisplay(parentEl) {
 
 function addGridEl(parentEl) {
   const gridEl = document.createElement("div");
-  gridEl.setAttribute("id", "grid");
+  gridEl.classList.add("grid");
   parentEl.appendChild(gridEl);
   return gridEl;
 }
@@ -157,10 +159,10 @@ function addGridEl(parentEl) {
  *
  * @param {*} e
  * @param {*} gameboard the target board (of whoever is not the currentPlayer)
- * @param {*} grid the #grid element used for targetting
+ * @param {*} grid the .grid element used for targetting
  * @param {*} handler the listener for torpedos
  */
-function torpedo(e, gameboard, grid, handler) {
+function torpedo(e, gameboard, grid) {
   const row = e.target.style.gridRow;
   const col = e.target.style.gridColumn;
   if (
@@ -190,15 +192,12 @@ function torpedo(e, gameboard, grid, handler) {
 
       nextBtn.classList.remove("hide");
       nextBtn.classList.add("show");
-      grid.removeEventListener("click", handler);
     }
   }
 }
 
 function play(e, mainPlayer, oppPlayer) {
   const parentEl = document.querySelector("#current-player-grid");
-  const gridEl = document.querySelector("#grid");
-  const instructionsEl = makePlayerGridDisplay(parentEl);
 
   const fleetStatusEl = document.querySelector("#fleet-status");
   let currentPlayer;
@@ -227,106 +226,184 @@ function play(e, mainPlayer, oppPlayer) {
         : mainPlayer.getBoard();
 
     const parentEl = document.querySelector("#current-player-grid");
-    torpedo(e, targetBoard, parentEl, throwATorpedo);
+    torpedo(e, targetBoard, parentEl);
 
     if (targetBoard.allShipsSunk()) {
       endGame(currentPlayer, oppPlayer);
     }
   }
 
-  if (e.target.id !== "main-player-turn" && e.target.id !== "opp-player-turn") {
-    parentEl.classList.add("pre-show"); //scales the element to hide it
-    gridEl.removeEventListener("click", throwATorpedo);
-    gridEl.addEventListener("click", throwATorpedo); //send opponent's board to be targeted
-    showElement(parentEl);
-    fleetStatusEl.classList.add("pre-show");
-    fleetStatusEl.innerHTML = ""; //clear out the old elements
-    fleetStatusEl.innerHTML = "<h3>Your Fleet Status</h3>";
-    displayShipsGrid(addGridEl(fleetStatusEl), currentPlayer, true);
-    showElement(fleetStatusEl);
-  } else {
-    parentEl.classList.remove("show");
-    fleetStatusEl.classList.remove("show");
-    parentEl.classList.add("hide");
-    fleetStatusEl.classList.add("hide");
-  }
-
   //we need to let the main player play if id is main-player
-  // if id is main-player-done then we show a splash with a button to allow next player to click and play
-  // if id is opp-player-done then we show a splash with a button to allow main player to click and play
   // if opponent is computer we skip some steps
   const computerIsPlaying = isPlayerAComputer(oppPlayer);
   let playerInstructions;
   let nextButton;
 
-  if (
-    e.target.id === "main-player" ||
-    (e.target.id === "opp-player" && !computerIsPlaying)
-  ) {
-    playerInstructions = `<h1>${currentPlayer.getName()}'s Target board</h1><details><summary>Instructions</summary><p>Clicking a cell will shoot a torpedo at that location.</p>`;
-    if (!computerIsPlaying) {
-      playerInstructions += `<p>After you're done click "next", then hand your device over to the other player.</p></details>`;
-    } else {
-      playerInstructions += `<p>After you're done click "next"</p></details>`;
-    }
-    nextButton = document.createElement("input");
-    nextButton.setAttribute("type", "button");
-    if (e.target.id === "main-player") {
-      computerIsPlaying
-        ? nextButton.setAttribute("id", "opp-player")
-        : nextButton.setAttribute("id", "opp-player-turn"); //to show a waiting screen
-    } else {
-      computerIsPlaying
-        ? nextButton.setAttribute("id", "main-player")
-        : nextButton.setAttribute("id", "main-player-turn"); //to show a waiting screen
-    }
-    nextButton.setAttribute("value", "next");
-    nextButton.addEventListener("click", (e) => {
-      play(e, mainPlayer, oppPlayer);
-    });
-    currentPlayer === mainPlayer
-      ? displayTargetGrid(gridEl, oppPlayer)
-      : displayTargetGrid(gridEl, mainPlayer);
-  } else if (e.target.id === "opp-player" && isPlayerAComputer(oppPlayer)) {
-    //computer plays
-    console.log("Computer's turn!");
-  } else if (
-    e.target.id === "main-player-turn" ||
-    e.target.id === "opp-player-turn"
-  ) {
-    //display hold page with a button to allow players to hand each other the computer
-    //
-    //<button type="button">Let's go!</button>
-    const yourTurnDialog = document.querySelector("#your-turn-dialog");
-    const yourTurnDialogBtn = document.querySelector(
-      "#your-turn-dialog>div>button"
-    );
-    if (e.target.id === "main-player-turn") {
-      yourTurnDialogBtn.setAttribute("id", "main-player");
-    } else {
-      yourTurnDialogBtn.setAttribute("id", "opp-player");
-    }
-    const playerNameEl = document.querySelector("#player-name");
-    playerNameEl.innerText = `${currentPlayer.getName()}`;
+  if (e.target.id === "opp-player" && computerIsPlaying) {
+    parentEl.classList.remove("show");
+    fleetStatusEl.classList.remove("show");
+    parentEl.classList.add("hide");
+    fleetStatusEl.classList.add("hide");
 
-    function nextTurn(e) {
-      yourTurnDialog.close();
-      play(e, mainPlayer, oppPlayer);
-      yourTurnDialogBtn.removeEventListener("click", nextTurn);
+    // during computer's turn, computer must try to throw a torpedo
+    // TODO add some intelligence to the choices the computer makes
+    // for now, the torpedos are randomly selected from valid locations
+    const gameboard = mainPlayer.getBoard();
+    const hitAShip = gameboard.receiveAttack(0, 0);
+
+    const computerTurnDialog = document.querySelector("#computer-turn");
+    const computerMessageEl = document.querySelector("#computer-message");
+    const torpedoGif = document.querySelector("#torpedo-gif");
+    const computerTurnButton = document.querySelector("#computer-turn button");
+    computerTurnButton.setAttribute("id", "main-player");
+    if (hitAShip) {
+      if (hitAShip.isSunk()) {
+        //show sinking ship dialog //TODO test when ship sinks
+        const computerSinksBoatDialog = document.querySelector(
+          "#computer-sinks-your-boat"
+        );
+        const computerSinksBoatButton = document.querySelector(
+          "#computer-sinks-your-boat button"
+        );
+        computerSinksBoatButton.addEventListener(
+          "click",
+          (e) => {
+            computerSinksBoatDialog.close();
+            humansTurn(e, mainPlayer, oppPlayer);
+          },
+          once
+        );
+        computerSinksBoatDialog.show();
+      } else {
+        //show dialog for hitting a ship
+        computerMessageEl.innerText = `The Computer has hit your ${hitAShip.name}!`;
+        torpedoGif.setAttribute("src", torpedoHit);
+        computerTurnButton.addEventListener(
+          "click",
+          (e) => {
+            computerTurnDialog.close();
+            humansTurn(e, mainPlayer, oppPlayer);
+          },
+          once
+        );
+        computerTurnDialog.showModal();
+      }
+    } else {
+      //show missed ship dialog //TODO test this
+      torpedoGif.setAttribute("src", torpedoMisses);
+      computerMessageEl.innerText = `The Computer couldn't hit any of your ships!`;
+      computerTurnButton.addEventListener(
+        "click",
+        (e) => {
+          computerTurnDialog.close();
+          humansTurn(e, mainPlayer, oppPlayer);
+        },
+        once
+      );
+      computerTurnDialog.showModal();
+    }
+  } else {
+    const instructionsEl = makePlayerGridDisplay(parentEl);
+    //gridEl has to always be retrieved after the makePlayerGridDisplay!!! (breakable code!)
+    const gridEl = document.querySelector("#current-player-grid .grid");
+
+    if (
+      e.target.id !== "main-player-turn" &&
+      e.target.id !== "opp-player-turn"
+    ) {
+      parentEl.classList.add("pre-show"); //scales the element to hide it
+      gridEl.addEventListener("click", throwATorpedo, once); //send opponent's board to be targeted
+      showElement(parentEl);
+      fleetStatusEl.classList.add("pre-show");
+      fleetStatusEl.innerHTML = ""; //clear out the old elements
+      fleetStatusEl.innerHTML = "<h3>Your Fleet Status</h3>";
+      displayShipsGrid(addGridEl(fleetStatusEl), currentPlayer, true);
+      showElement(fleetStatusEl);
+    } else {
+      parentEl.classList.remove("show");
+      fleetStatusEl.classList.remove("show");
+      parentEl.classList.add("hide");
+      fleetStatusEl.classList.add("hide");
     }
 
-    yourTurnDialogBtn.addEventListener("click", nextTurn);
+    if (
+      e.target.id === "main-player" ||
+      (e.target.id === "opp-player" && !computerIsPlaying)
+    ) {
+      playerInstructions = `<h1>${currentPlayer.getName()}'s Target board</h1><details><summary>Instructions</summary><p>Clicking a cell will shoot a torpedo at that location.</p>`;
+      if (!computerIsPlaying) {
+        playerInstructions += `<p>After you're done click "next", then hand your device over to the other player.</p></details>`;
+      } else {
+        playerInstructions += `<p>After you're done click "next"</p></details>`;
+      }
+      nextButton = document.createElement("input");
+      nextButton.setAttribute("type", "button");
+      if (e.target.id === "main-player") {
+        computerIsPlaying
+          ? nextButton.setAttribute("id", "opp-player")
+          : nextButton.setAttribute("id", "opp-player-turn"); //to show a waiting screen
+      } else {
+        computerIsPlaying
+          ? nextButton.setAttribute("id", "main-player")
+          : nextButton.setAttribute("id", "main-player-turn"); //to show a waiting screen
+      }
+      nextButton.setAttribute("value", "next");
+      nextButton.addEventListener("click", (e) => {
+        play(e, mainPlayer, oppPlayer);
+      });
+      currentPlayer === mainPlayer
+        ? displayTargetGrid(gridEl, oppPlayer)
+        : displayTargetGrid(gridEl, mainPlayer);
 
-    yourTurnDialog.showModal();
-    const dialogDivs = document.querySelectorAll("#your-turn-dialog>div>*");
-    staggeredShowElement(dialogDivs);
+      instructionsEl.innerHTML = playerInstructions;
+      if (nextButton) {
+        nextButton.classList.add("hide");
+        nextButton.classList.remove("show", "pre-show");
+        instructionsEl.appendChild(nextButton);
+      }
+    } else if (
+      e.target.id === "main-player-turn" ||
+      e.target.id === "opp-player-turn"
+    ) {
+      //display hold page with a button to allow players to hand each other the computer
+      //
+      //<button type="button">Let's go!</button>
+      displayYourTurnPane(currentPlayer, mainPlayer, oppPlayer);
+    }
   }
-  instructionsEl.innerHTML = playerInstructions;
-  if (nextButton) {
-    nextButton.classList.add("hide");
-    nextButton.classList.remove("show", "pre-show");
-    instructionsEl.appendChild(nextButton);
+}
+
+const once = {
+  once: true,
+};
+
+function humansTurn(e, mainPlayer, oppPlayer) {
+  play(e, mainPlayer, oppPlayer);
+}
+
+function displayYourTurnPane(currentPlayer, mainPlayer, oppPlayer) {
+  const yourTurnDialog = document.querySelector("#your-turn-dialog");
+  const yourTurnDialogBtn = document.querySelector(
+    "#your-turn-dialog>div>button"
+  );
+  if (e.target.id === "main-player-turn") {
+    yourTurnDialogBtn.setAttribute("id", "main-player");
+  } else {
+    yourTurnDialogBtn.setAttribute("id", "opp-player");
   }
+  const playerNameEl = document.querySelector("#player-name");
+  playerNameEl.innerText = `${currentPlayer.getName()}`;
+
+  function nextTurn(e) {
+    yourTurnDialog.close();
+    play(e, mainPlayer, oppPlayer);
+  }
+
+  yourTurnDialogBtn.addEventListener("click", nextTurn, once);
+
+  yourTurnDialog.showModal();
+  const dialogDivs = document.querySelectorAll("#your-turn-dialog>div>*");
+  staggeredShowElement(dialogDivs);
 }
 
 function displayTargetGrid(gridEl, oppPlayer) {
@@ -410,8 +487,12 @@ function displayTargetGrid(gridEl, oppPlayer) {
 }
 
 /**
+ * Displays a grid with the current player's ships on it
+ * The ships may be 'responsive' to user interaction or they may not be responsive based on the flag.
+ * Responsive ships allow the user to toggle between rotation/move modes and modify the ship locations
+ * and direction/alignment
  *
- * @param {*} gridEl the div#grid element
+ * @param {*} gridEl the div.grid element
  * @param {*} currentPlayer
  * @param {*} unresponsive set to true if displaying the board after the game has started (setup done earlier)
  */

@@ -249,7 +249,7 @@ function play(e, mainPlayer, oppPlayer) {
     // TODO add some intelligence to the choices the computer makes
     // for now, the torpedos are randomly selected from valid locations
     const gameboard = mainPlayer.getBoard();
-    const hitAShip = gameboard.receiveAttack(0, 0);
+    const hitAShip = computerAttacks(gameboard);
 
     const computerTurnDialog = document.querySelector("#computer-turn");
     const computerMessageEl = document.querySelector("#computer-message");
@@ -258,25 +258,29 @@ function play(e, mainPlayer, oppPlayer) {
     computerTurnButton.setAttribute("id", "main-player");
     if (hitAShip) {
       if (hitAShip.isSunk()) {
-        //show sinking ship dialog //TODO test when ship sinks
-        const computerSinksBoatDialog = document.querySelector(
-          "#computer-sinks-your-boat"
-        );
-        const computerSinksBoatButton = document.querySelector(
-          "#computer-sinks-your-boat button"
-        );
-        computerSinksBoatButton.addEventListener(
-          "click",
-          (e) => {
-            computerSinksBoatDialog.close();
-            humansTurn(e, mainPlayer, oppPlayer);
-          },
-          once
-        );
-        computerSinksBoatDialog.show();
+        if (gameboard.allShipsSunk()) {
+          endGame(currentPlayer, mainPlayer);
+        } else {
+          //show sinking ship dialog //TODO test when ship sinks
+          const computerSinksBoatDialog = document.querySelector(
+            "#computer-sinks-your-boat"
+          );
+          const computerSinksBoatButton = document.querySelector(
+            "#computer-sinks-your-boat button"
+          );
+          computerSinksBoatButton.addEventListener(
+            "click",
+            (e) => {
+              computerSinksBoatDialog.close();
+              humansTurn(e, mainPlayer, oppPlayer);
+            },
+            once
+          );
+          computerSinksBoatDialog.show();
+        }
       } else {
         //show dialog for hitting a ship
-        computerMessageEl.innerText = `The Computer has hit your ${hitAShip.name}!`;
+        computerMessageEl.innerText = `The Computer manages to hit your ${hitAShip.name}!`;
         torpedoGif.setAttribute("src", torpedoHit);
         computerTurnButton.addEventListener(
           "click",
@@ -291,7 +295,7 @@ function play(e, mainPlayer, oppPlayer) {
     } else {
       //show missed ship dialog //TODO test this
       torpedoGif.setAttribute("src", torpedoMisses);
-      computerMessageEl.innerText = `The Computer couldn't hit any of your ships!`;
+      computerMessageEl.innerText = `The Computer tries but fails to hit any of your ships!`;
       computerTurnButton.addEventListener(
         "click",
         (e) => {
@@ -670,4 +674,23 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
   }
 
   //console.log(gameboard.getBoardArray());
+}
+
+/**
+ * this function tries to give the computer player some good moves to play
+ * otherwise, it's just random luck!
+ * @param {*} gameboard
+ */
+function computerAttacks(gameboard) {
+  //don't repeat the hits or the misses!
+  const hitsAndMisses = [...gameboard.misses, ...gameboard.hits];
+  let viableTarget = null;
+  do {
+    //fake till you make it
+    const x = Math.floor(Math.random() * 10);
+    const y = Math.floor(Math.random() * 10);
+
+    viableTarget = { x, y };
+  } while (!viableTarget);
+  return gameboard.receiveAttack(viableTarget.x, viableTarget.y);
 }

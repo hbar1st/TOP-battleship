@@ -14,6 +14,7 @@ import {
   createHumanPlayer,
   createComputerPlayer,
   isPlayerAComputer,
+  computerAttacks,
 } from "./player.js";
 
 import { Gameboard } from "./gameboard.js";
@@ -95,7 +96,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
         <p>Click "play" to lock the board and start the game.</p>
         <input type="button" id="play" value="play" />
      */
-  const playerGridSetupInstructions = `<h2>Let's setup your board! Click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.</h2>`;
+  const playerGridSetupInstructions = `<h2>Let's setup your board! If you like the current random setup, click "play" to continue the game. Otherwise, click on a ship to toggle motion type (move vs. rotate). Use the anchor to drag. Or click the anchor to rotate.</h2>`;
   const playerGridLockParagraph = `<p>Click "play" to lock the board and start the game.</p>`;
   const playerGridLockButton = document.createElement("input");
   playerGridLockButton.setAttribute("type", "button");
@@ -249,7 +250,7 @@ function play(e, mainPlayer, oppPlayer) {
     // TODO add some intelligence to the choices the computer makes
     // for now, the torpedos are randomly selected from valid locations
     const gameboard = mainPlayer.getBoard();
-    const hitAShip = computerAttacks(gameboard);
+    const hitAShip = computerAttacks(gameboard, oppPlayer);
 
     const computerTurnDialog = document.querySelector("#computer-turn");
     const computerMessageEl = document.querySelector("#computer-message");
@@ -674,23 +675,4 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
   }
 
   //console.log(gameboard.getBoardArray());
-}
-
-/**
- * this function tries to give the computer player some good moves to play
- * otherwise, it's just random luck!
- * @param {*} gameboard
- */
-function computerAttacks(gameboard) {
-  //don't repeat the hits or the misses!
-  const hitsAndMisses = [...gameboard.misses, ...gameboard.hits];
-  let viableTarget = null;
-  do {
-    //fake till you make it
-    const x = Math.floor(Math.random() * 10);
-    const y = Math.floor(Math.random() * 10);
-
-    viableTarget = { x, y };
-  } while (!viableTarget);
-  return gameboard.receiveAttack(viableTarget.x, viableTarget.y);
 }

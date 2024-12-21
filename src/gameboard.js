@@ -238,4 +238,17 @@ export class Gameboard {
     });
     return found === 0;
   }
+
+  placeShipRandomly(ship) {
+    const dir = Math.floor(Math.random() * 2);
+    let randomDir;
+    randomDir = dir ? Gameboard.horizontal : Gameboard.vertical;
+
+    let placed = false;
+    do {
+      const x = Math.floor(Math.random() * 10);
+      const y = Math.floor(Math.random() * 10);
+      placed = this.placeShip(ship, x, y, randomDir);
+    } while (!placed);
+  }
 }

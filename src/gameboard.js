@@ -251,4 +251,42 @@ export class Gameboard {
       placed = this.placeShip(ship, x, y, randomDir);
     } while (!placed);
   }
+
+  isCellSurroundedByWater(x, y) {
+    const surroundings = this.getSurroundingPositions(x, y);
+    const waterCells = surroundings.filter((nearPos) => {
+      const res = this.misses.find((pos) => {
+        return nearPos.x === pos.x && nearPos.y === pos.y;
+      });
+      return res ?? false;
+    });
+    return waterCells.length === surroundings.length;
+  }
+
+  getSurroundingPositions(x, y, dir = null) {
+    const surroundings = [];
+    //set surrounding positions
+
+    // x+1, y
+    if (!dir || dir === Gameboard.horizontal) {
+      if (x + 1 < this.size) {
+        surroundings.push({ x: x + 1, y });
+      }
+      // x-1, y
+      if (x - 1 >= 0) {
+        surroundings.push({ x: x - 1, y });
+      }
+    }
+    if (!dir || dir === Gameboard.vertical) {
+      // x, y+1
+      if (y + 1 < this.size) {
+        surroundings.push({ x, y: y + 1 });
+      }
+      // x, y-1
+      if (y - 1 >= 0) {
+        surroundings.push({ x, y: y - 1 });
+      }
+    }
+    return surroundings;
+  }
 }

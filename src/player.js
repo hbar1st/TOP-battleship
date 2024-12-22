@@ -14,19 +14,6 @@ export function createHumanPlayer(pname, id) {
   }
   const player = createPlayer("human", pname, id);
   const board = player.getBoard();
-  /*
-  const carrier = new Carrier();
-  const battleship = new Battleship();
-  const destroyer = new Destroyer();
-  const submarine = new Submarine();
-  const patrolBoat = new PatrolBoat();
-  // initially we are hardcoding the locations of the ships
-
-  board.placeShip(patrolBoat, 4, 4, Gameboard.horizontal);
-  board.placeShip(destroyer, 7, 0, Gameboard.horizontal);
-  board.placeShip(submarine, 0, 9, Gameboard.horizontal);
-  board.placeShip(battleship, 0, 0, Gameboard.vertical);
-  board.placeShip(carrier, 9, 5, Gameboard.vertical);*/
 
   board.placeShipRandomly(new PatrolBoat());
   board.placeShipRandomly(new Carrier());
@@ -43,17 +30,117 @@ export function isPlayerAComputer(player) {
 export function createComputerPlayer(id) {
   const computerPlayer = createPlayer("computer", "The Computer", id);
   const board = computerPlayer.getBoard();
-
-  const opponentBoardMemory = {}; //a list of all ships sunk with their locations
-  const memory = {}; // a list of hits that form a line vertically or horizontally
+  let targetDir = null;
+  const opponentBoardMemory = new Map(); //a list of all ships sunk with their occupied locations
+  const memory = []; // a list of hits that form a line vertically or horizontally
 
   board.placeShipRandomly(new PatrolBoat());
   board.placeShipRandomly(new Carrier());
   board.placeShipRandomly(new Battleship());
   board.placeShipRandomly(new Destroyer());
   board.placeShipRandomly(new Submarine());
+  console.log("The Computer's Board:");
+  console.log(board.getBoardArray()); //TODO remove this!!
+  /**
+   * this function tries to give the computer player some good moves to play
+   * otherwise, it's just random luck!
+   * @param {*} gameboard
+   */
+  function computerAttacks(targetboard) {
+    //don't repeat the hits or the misses!
+    const hits = targetboard.hits;
+    const misses = targetboard.misses;
+    const hitsAndMisses = [...misses, ...hits];
+    let viableTarget = null;
 
-  const strategicData = { opponentBoardMemory, memory };
+    function isDuplicated(x, y) {
+      const duplicatePlay = hitsAndMisses.filter(
+        (pos) => pos.x === x && pos.y === y
+      );
+      return duplicatePlay.length > 0;
+    }
+    let debugIndex = 0;
+    do {
+      // use a random pos if nothing better available
+      let x = Math.floor(Math.random() * 10);
+      let y = Math.floor(Math.random() * 10);
+      let surroundingPos = [];
+      if (memory.length === 1) {
+        //try to establish a direction with the previous hit we found
+        surroundingPos = targetboard.getSurroundingPositions(
+          memory[0].x,
+          memory[0].y
+        );
+      } else if (memory.length > 1) {
+        memory.forEach((prevHit) => {
+          const pos = targetboard.getSurroundingPositions(
+            prevHit.x,
+            prevHit.y,
+            targetDir
+          );
+
+          pos.forEach((p) => {
+            if (!isDuplicated(p)) {
+              surroundingPos.push(p);
+            }
+          });
+        });
+      }
+
+      // find a viable target
+      let index = 0;
+      while (index < surroundingPos.length) {
+        if (!isDuplicated(surroundingPos[index])) {
+          x = surroundingPos[index].x;
+          y = surroundingPos[index].y;
+          break;
+        }
+        index++;
+      }
+
+      //check if this cell is a dead-end
+      if (!targetboard.isCellSurroundedByWater(x, y)) {
+        //check if target makes sense
+        if (!isDuplicated(x, y)) {
+          viableTarget = { x, y };
+        }
+      }
+    } while (!viableTarget && ++debugIndex < 100);
+    console.log("debugIndex =", debugIndex);
+    const res = targetboard.receiveAttack(viableTarget.x, viableTarget.y);
+    if (res && res.isSunk()) {
+      //clear the memory
+      memory = [];
+    } else if (res) {
+      // a hit was made
+      memory.push(viableTarget);
+      if (memory.length === 2) {
+        //establish direction
+        if (memory[0].x === memory[1].x) {
+          targetDir = Gameboard.vertical;
+        } else {
+          targetDir = Gameboard.horizontal;
+        }
+      }
+    }
+    return res;
+  }
+
+  function getShipPositions(ship, x, y) {
+    const positions = [];
+    if (ship.dir === Gameboard.horizontal) {
+      //for (let i = )
+    } else {
+    }
+    return positions;
+  }
+
+  const strategicData = {
+    opponentBoardMemory,
+    memory,
+    computerAttacks,
+  };
+
   return Object.assign(computerPlayer, strategicData);
 }
 
@@ -79,27 +166,4 @@ function createPlayer(type, pname, pid) {
     return id;
   };
   return { getBoard, getName, getId };
-}
-
-/**
- * this function tries to give the computer player some good moves to play
- * otherwise, it's just random luck!
- * @param {*} gameboard
- */
-export function computerAttacks(gameboard, computer) {
-  //don't repeat the hits or the misses!
-  const hits = gameboard.hits;
-  const hitsAndMisses = [...gameboard.misses, ...hits];
-  let viableTarget = null;
-  do {
-    // how to tell if a prior hit is forming a line?
-    const x = Math.floor(Math.random() * 10);
-    const y = Math.floor(Math.random() * 10);
-    //check if target makes sense
-    duplicatePlay = hitsAndMisses.filter((pos) => pos.x === x && pos.y === y);
-    if (duplicatePlay.length === 0) {
-      viableTarget = { x, y };
-    }
-  } while (!viableTarget);
-  return gameboard.receiveAttack(viableTarget.x, viableTarget.y);
 }

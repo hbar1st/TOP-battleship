@@ -14,7 +14,6 @@ import {
   createHumanPlayer,
   createComputerPlayer,
   isPlayerAComputer,
-  computerAttacks,
 } from "./player.js";
 
 import { Gameboard } from "./gameboard.js";
@@ -250,7 +249,7 @@ function play(e, mainPlayer, oppPlayer) {
     // TODO add some intelligence to the choices the computer makes
     // for now, the torpedos are randomly selected from valid locations
     const gameboard = mainPlayer.getBoard();
-    const hitAShip = computerAttacks(gameboard, oppPlayer);
+    const hitAShip = oppPlayer.computerAttacks(gameboard);
 
     const computerTurnDialog = document.querySelector("#computer-turn");
     const computerMessageEl = document.querySelector("#computer-message");

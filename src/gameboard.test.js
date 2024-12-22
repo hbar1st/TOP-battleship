@@ -306,4 +306,16 @@ describe("Gameboard Test", () => {
     expect(shipObj).toMatchObject(expected);
   });
   */
+
+  test("Gameboard Knows If Cell Is Surrounded By Water", () => {
+    const gameboard = new Gameboard("Player", 5);
+
+    gameboard.placeShip(carrier, 0, 4, Gameboard.horizontal); // (0,1), (1,1), (2, 1), (3, 1), (4, 1)
+
+    gameboard.receiveAttack(0, 0); //miss
+    gameboard.receiveAttack(2, 2); //miss
+    gameboard.receiveAttack(2, 0); //miss
+    gameboard.receiveAttack(1, 1); //miss  - now cell (1,0) is surrounded by water
+    expect(gameboard.isCellSurroundedByWater(1, 0)).toBeTruthy();
+  });
 });

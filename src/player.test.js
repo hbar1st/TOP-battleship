@@ -21,7 +21,7 @@ describe("Computer Player Test", () => {
 
   test("Computer Player Created", () => {
     expect(computer.getBoard()).toBeInstanceOf(Gameboard);
-    expect(computer.getName()).toBe("Computer");
+    expect(computer.getName()).toBe("The Computer");
     expect(computer.getId()).toBe("opp-player");
   });
 

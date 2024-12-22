@@ -1,10 +1,5 @@
+Battleship game to be played either against the computer or against someone who is nearby (please exchange seats or move the device monitor to allow 2 players to play against each other).
 
-Instructions for running the build (dev mode and prod mode):
+The ships are initially configured in a random setup for you. If you wish to change the setup, click once on any ship to turn on drag-and-drop mode. Click again on the same ship to turn on rotation mode to rotate. You must click the rotate anchor image in order to rotate. Rotation may not always be possible if there are nearby ships in the way. You may have to drag the ship somewhere free and then rotate. The rotation happens around the endpoint that is closest to the origin. The origin is the point that represents the lowest-leftmost corner of the grid.
 
-- From the root path of the repo run `npm install` first to download the dependencies then
-- run `npm run dev` to start a web server and perform development (preview path will be http://localhost:8080/)
-- the TOP webpack lesson has examples of how to import/export css/images/code <https://www.theodinproject.com/lessons/javascript-webpack>
-- Use normal `git add .` and `git commit -m ...` to work on the files until the app is complete
-- In gh-pages branch, run `npm run build` when you're ready for production push
-- followed by `git add dist -f` (to force the add to ignore the .gitignore) and `git commit -m "Deployment commit"`
-- finally run `npm run deploy` to push the code out to the gh-pages branch, followed by `git checkout main` to return to the main branch
+Playing against the computer runs a bit faster, so try this if you are in a rush. Enjoy!

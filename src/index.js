@@ -220,9 +220,6 @@ function play(e, mainPlayer, oppPlayer) {
   }
 
   function throwATorpedo(e) {
-    currentPlayer === mainPlayer
-      ? console.log(`${oppPlayer.getName()}`)
-      : console.log(`${mainPlayer.getName()}`);
 
     const targetBoard =
       currentPlayer === mainPlayer
@@ -571,10 +568,7 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
           let x1 = Number(col);
           let y1 = Number(row);
           const shipData = gameboard.getShipById(id);
-          if (shipData === null) {
-            console.log("We have a bug here");
-            return;
-          }
+
           if (shipData.dir === Gameboard.horizontal) {
             if (mouseLoc === "center") {
               const delta = Math.floor(shipData.ship.length / 2);
@@ -678,5 +672,4 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
     }
   }
 
-  //console.log(gameboard.getBoardArray());
 }

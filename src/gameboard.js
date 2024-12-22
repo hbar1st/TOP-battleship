@@ -306,4 +306,40 @@ export class Gameboard {
     );
     return duplicatePlay.length > 0;
   }
+
+  toggleDir(dir) {
+    if (dir === Gameboard.horizontal) {
+      return Gameboard.vertical;
+    } else {
+      return Gameboard.horizontal;
+    }
+  }
+
+  pickRandomRemainingPos() {
+    const hitsAndMisses = [...this.misses, ...this.hits];
+    const pick = Math.floor(Math.random() * (100 - hitsAndMisses.length));
+    const allPos = [];
+    const remainingPos = [];
+    for (let i = 0; i < this.size; i++) {
+      allPos.push([]); //create the rows
+      for (let j = 0; j < this.size; j++) {
+        allPos[i].push(0); //create the columns
+      }
+    }
+    //populate the hits and misses first
+    hitsAndMisses.forEach((pos) => {
+      allPos[pos.x][pos.y] = pos;
+    });
+
+    //populate the remaining spots
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        if (allPos[i][j] === 0) {
+          remainingPos.push({ x: i, y: j });
+        }
+      }
+    }
+
+    return remainingPos[pick];
+  }
 }

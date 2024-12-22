@@ -22,7 +22,6 @@ function showElement(el, timeout = 0) {
 }
 
 function staggeredShowElement(elList) {
-  console.log(elList);
   elList.forEach((el, i) => {
     showElement(el, (i + 2) * 100);
   });
@@ -85,7 +84,6 @@ function shiftMode(e, currentPlayer) {
     if (!child || (child && child.id === "rotate-anchor")) {
       shipEl.setAttribute("draggable", "true");
       shipEl.addEventListener("dragstart", (event) => {
-        console.log(event.clientX, event.clientY);
         const rect = shipEl.getBoundingClientRect();
         let mouseLoc = "right";
         if (shipEl.getAttribute("data-dir") === Gameboard.horizontal) {
@@ -137,8 +135,6 @@ function shiftMode(e, currentPlayer) {
 }
 
 function rotateShip(e, currentPlayer) {
-  console.log(e.target);
-  console.log(e.target.parentElement);
 
   const shipEl = e.target.parentElement;
   const dir = shipEl.getAttribute("data-dir");

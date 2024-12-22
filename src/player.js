@@ -38,8 +38,6 @@ export function createComputerPlayer(id) {
   board.placeShipRandomly(new Battleship());
   board.placeShipRandomly(new Destroyer());
   board.placeShipRandomly(new Submarine());
-  console.log("The Computer's Board:");
-  console.log(board.getBoardArray()); //TODO remove this!!
   /**
    * this function tries to give the computer player some good moves to play
    * otherwise, it's just random luck!
@@ -54,8 +52,9 @@ export function createComputerPlayer(id) {
     let debugIndex = 0;
     do {
       // use a random pos if nothing better available
-      let x = Math.floor(Math.random() * 10);
-      let y = Math.floor(Math.random() * 10);
+      const randomPick = targetboard.pickRandomRemainingPos();
+      let x = randomPick.x;
+      let y = randomPick.y;
       let surroundingPos = [];
       if (memory.length === 1) {
         //try to establish a direction with the previous hit we found
@@ -74,6 +73,9 @@ export function createComputerPlayer(id) {
             ),
           ];
         });
+        if (surroundingPos.length === 0) {
+          targetDir = targetboard.toggleDir(targetDir);
+        }
       }
 
       if (surroundingPos.length > 0) {
@@ -87,8 +89,12 @@ export function createComputerPlayer(id) {
           viableTarget = { x, y };
         }
       }
-    } while (!viableTarget && ++debugIndex < 100);
-    if (debugIndex === 100) {
+      if (debugIndex === 100) {
+        //force memory reset so we don't crash because we're in an infinite loop
+        memory = [];
+      }
+    } while (!viableTarget && ++debugIndex < 200);
+    if (debugIndex === 200) {
       throw new Error(
         "Found a bug in the computer playing logic, please report logs"
       );
@@ -96,9 +102,65 @@ export function createComputerPlayer(id) {
     const res = targetboard.receiveAttack(viableTarget.x, viableTarget.y);
     if (res && res.isSunk()) {
       //clear the memory of cells that belong to that ship only
-      for (let i = 0; i < res.length - 1; i++) {
-        memory.pop();
+      const sortedPos = [viableTarget];
+      for (let i = 0; i < memory.length; i++) {
+        if (targetDir === Gameboard.horizontal) {
+          if (memory[i].y === viableTarget.y) {
+            if (sortedPos.length > 0) {
+              //try to insert the current pos into the sortedPos
+              for (let j = 0; j < sortedPos.length; j++) {
+                if (memory[i].x < sortedPos[j].x) {
+                  sortedPos.splice(j, 0, memory[i]);
+                  break;
+                } else {
+                  if (j === sortedPos.length - 1) {
+                    //insert at the end
+                    sortedPos.push(memory[i]);
+                    break;
+                  }
+                }
+              }
+            } else {
+              sortedPos.push(memory[i]);
+            }
+          }
+        } else {
+          if (memory[i].x === viableTarget.x) {
+            if (sortedPos.length > 0) {
+              //try to insert the current pos into the sortedPos
+              for (let j = 0; j < sortedPos.length; j++) {
+                if (memory[i].y < sortedPos[j].y) {
+                  sortedPos.splice(j, 0, memory[i]);
+                  break;
+                }
+              }
+            } else {
+              sortedPos.push(memory[i]);
+            }
+          }
+        }
       }
+
+      // what is the index of the viableTarget in the sortedPos list?
+      // if the index minus the size of the boat +f1)  is < 0, then go right++
+      // but if the index plus the size of the boat > (size-1), then go left-- ()
+      let vtIndex = 0;
+      for (let i = 0; i < res.length; i++) {
+        if (
+          sortedPos[i].x === viableTarget.x &&
+          sortedPos[i].y === viableTarget.y
+        ) {
+          vtIndex = i;
+          break;
+        }
+      }
+      if (vtIndex - res.length + 1 < 0) {
+        sortedPos.splice(vtIndex, res.length);
+      } else {
+        sortedPos.splice(vtIndex - res.length + 1, res.length);
+      }
+
+      memory = [...sortedPos];
     } else if (res) {
       // a hit was made
       memory.push(viableTarget);

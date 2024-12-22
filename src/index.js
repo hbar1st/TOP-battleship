@@ -220,7 +220,6 @@ function play(e, mainPlayer, oppPlayer) {
   }
 
   function throwATorpedo(e) {
-
     const targetBoard =
       currentPlayer === mainPlayer
         ? oppPlayer.getBoard()
@@ -397,11 +396,8 @@ function displayYourTurnPane(currentPlayer, mainPlayer, oppPlayer) {
   const yourTurnDialogBtn = document.querySelector(
     "#your-turn-dialog>div>button"
   );
-  if (e.target.id === "main-player-turn") {
-    yourTurnDialogBtn.setAttribute("id", "main-player");
-  } else {
-    yourTurnDialogBtn.setAttribute("id", "opp-player");
-  }
+  yourTurnDialogBtn.setAttribute("id", currentPlayer.getId());
+
   const playerNameEl = document.querySelector("#player-name");
   playerNameEl.innerText = `${currentPlayer.getName()}`;
 
@@ -671,5 +667,4 @@ function displayShipsGrid(gridEl, currentPlayer, unresponsive = false) {
       gridEl.appendChild(mirrorboard[i][j]);
     }
   }
-
 }

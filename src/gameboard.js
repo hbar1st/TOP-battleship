@@ -249,6 +249,14 @@ export class Gameboard {
       const x = Math.floor(Math.random() * 10);
       const y = Math.floor(Math.random() * 10);
       placed = this.placeShip(ship, x, y, randomDir);
+      if (!placed) {
+        //try the other direction
+        if (randomDir === Gameboard.horizontal) {
+          placed = this.placeShip(ship, x, y, Gameboard.vertical);
+        } else {
+          placed = this.placeShip(ship, x, y, Gameboard.horizontal);
+        }
+      }
     } while (!placed);
   }
 
@@ -269,24 +277,33 @@ export class Gameboard {
 
     // x+1, y
     if (!dir || dir === Gameboard.horizontal) {
-      if (x + 1 < this.size) {
+      if (x + 1 < this.size && !this.isDuplicated(x + 1, y)) {
         surroundings.push({ x: x + 1, y });
       }
       // x-1, y
-      if (x - 1 >= 0) {
+      if (x - 1 >= 0 && !this.isDuplicated(x - 1, y)) {
         surroundings.push({ x: x - 1, y });
       }
     }
     if (!dir || dir === Gameboard.vertical) {
       // x, y+1
-      if (y + 1 < this.size) {
+      if (y + 1 < this.size && !this.isDuplicated(x, y + 1)) {
         surroundings.push({ x, y: y + 1 });
       }
       // x, y-1
-      if (y - 1 >= 0) {
+      if (y - 1 >= 0 && !this.isDuplicated(x, y - 1)) {
         surroundings.push({ x, y: y - 1 });
       }
     }
     return surroundings;
+  }
+
+  isDuplicated(x, y) {
+    const hitsAndMisses = [...this.misses, ...this.hits];
+
+    const duplicatePlay = hitsAndMisses.filter(
+      (pos) => pos.x === x && pos.y === y
+    );
+    return duplicatePlay.length > 0;
   }
 }

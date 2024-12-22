@@ -31,8 +31,7 @@ export function createComputerPlayer(id) {
   const computerPlayer = createPlayer("computer", "The Computer", id);
   const board = computerPlayer.getBoard();
   let targetDir = null;
-  const opponentBoardMemory = new Map(); //a list of all ships sunk with their occupied locations
-  const memory = []; // a list of hits that form a line vertically or horizontally
+  let memory = []; // a list of hits that form a line vertically or horizontally
 
   board.placeShipRandomly(new PatrolBoat());
   board.placeShipRandomly(new Carrier());
@@ -50,15 +49,8 @@ export function createComputerPlayer(id) {
     //don't repeat the hits or the misses!
     const hits = targetboard.hits;
     const misses = targetboard.misses;
-    const hitsAndMisses = [...misses, ...hits];
     let viableTarget = null;
 
-    function isDuplicated(x, y) {
-      const duplicatePlay = hitsAndMisses.filter(
-        (pos) => pos.x === x && pos.y === y
-      );
-      return duplicatePlay.length > 0;
-    }
     let debugIndex = 0;
     do {
       // use a random pos if nothing better available
@@ -73,52 +65,48 @@ export function createComputerPlayer(id) {
         );
       } else if (memory.length > 1) {
         memory.forEach((prevHit) => {
-          const pos = targetboard.getSurroundingPositions(
-            prevHit.x,
-            prevHit.y,
-            targetDir
-          );
-
-          pos.forEach((p) => {
-            if (!isDuplicated(p)) {
-              surroundingPos.push(p);
-            }
-          });
+          surroundingPos = [
+            ...surroundingPos,
+            ...targetboard.getSurroundingPositions(
+              prevHit.x,
+              prevHit.y,
+              targetDir
+            ),
+          ];
         });
       }
 
-      // find a viable target
-      let index = 0;
-      while (index < surroundingPos.length) {
-        if (!isDuplicated(surroundingPos[index])) {
-          x = surroundingPos[index].x;
-          y = surroundingPos[index].y;
-          break;
-        }
-        index++;
+      if (surroundingPos.length > 0) {
+        x = surroundingPos[0].x;
+        y = surroundingPos[0].y;
       }
-
       //check if this cell is a dead-end
       if (!targetboard.isCellSurroundedByWater(x, y)) {
         //check if target makes sense
-        if (!isDuplicated(x, y)) {
+        if (!targetboard.isDuplicated(x, y)) {
           viableTarget = { x, y };
         }
       }
     } while (!viableTarget && ++debugIndex < 100);
-    console.log("debugIndex =", debugIndex);
+    if (debugIndex === 100) {
+      throw new Error(
+        "Found a bug in the computer playing logic, please report logs"
+      );
+    }
     const res = targetboard.receiveAttack(viableTarget.x, viableTarget.y);
     if (res && res.isSunk()) {
-      //clear the memory
-      memory = [];
+      //clear the memory of cells that belong to that ship only
+      for (let i = 0; i < res.length - 1; i++) {
+        memory.pop();
+      }
     } else if (res) {
       // a hit was made
       memory.push(viableTarget);
-      if (memory.length === 2) {
+      if (memory.length >= 2) {
         //establish direction
         if (memory[0].x === memory[1].x) {
           targetDir = Gameboard.vertical;
-        } else {
+        } else if (memory[0].y === memory[1].y) {
           targetDir = Gameboard.horizontal;
         }
       }
@@ -126,17 +114,7 @@ export function createComputerPlayer(id) {
     return res;
   }
 
-  function getShipPositions(ship, x, y) {
-    const positions = [];
-    if (ship.dir === Gameboard.horizontal) {
-      //for (let i = )
-    } else {
-    }
-    return positions;
-  }
-
   const strategicData = {
-    opponentBoardMemory,
     memory,
     computerAttacks,
   };

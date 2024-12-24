@@ -96,7 +96,8 @@ body {
   padding: 1rem 3rem;
   gap: 3px;
   background-color: #8e784e;
-  div {
+  h1 {
+    font-weight: 500;
     text-align: center;
     border-bottom: 2px solid rgb(107, 76, 5);
     border-top: 3px solid rgb(245, 234, 219);
@@ -107,16 +108,16 @@ body {
     transform: scale(1, 0);
     box-shadow: 0px 2px 3px 1px rgb(107, 76, 5);
   }
-  div:first-child.show {
+  h1:first-child.show {
     transform: scale(1) skew(-1deg, 0deg);
   }
-  div:nth-child(2).show {
+  h1:nth-child(2).show {
     transform: scale(1) skew(2deg, 1deg);
   }
-  div:nth-child(3).show {
+  h1:nth-child(3).show {
     transform: scale(1) skew(1deg, 2deg);
   }
-  div:nth-child(4).show {
+  h1:nth-child(4).show {
     transform: scale(1) skew(3deg, 0deg);
   }
 
@@ -222,10 +223,12 @@ h1 {
 }
 h1,
 h2 {
+  font-weight: 500;
   border-bottom: 2px solid #808080;
 }
 
 h1 > em {
+  font-weight: 700;
   font-size: clamp(18px, 6vw, 4.5rem);
   letter-spacing: 1px;
   font-kerning: normal;
@@ -338,6 +341,9 @@ input:hover {
   width: min-content;
   background-color: #00bcd4;
 
+  h1 {
+    font-size: 2rem;
+  }
   h2,
   p,
   input {

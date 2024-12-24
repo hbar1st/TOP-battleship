@@ -144,7 +144,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
 function makePlayerGridDisplay(parentEl) {
   parentEl.classList.add("pre-show");
   parentEl.classList.remove("show", "hide");
-  const instructionsEl = document.createElement("div");
+  const instructionsEl = document.createElement("p");
   instructionsEl.classList.add("instructions");
   parentEl.innerHTML = ""; //clear out the old elements
   parentEl.appendChild(instructionsEl);

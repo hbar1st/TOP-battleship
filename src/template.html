@@ -7,22 +7,15 @@
   </head>
   <body>
     <main>
-      <div id="end-game">
+      <section id="end-game">
         <div>
           <h1>Congratulations <span id="winner-name"></span>, you won!</h1>
           <button type="button" id="play-again">Play Again!</button>
           <button type="button" id="hide-pane">Hide this message.</button>
         </div>
-      </div>
-      <div id="current-player-grid"></div>
-      <div id="fleet-status" class="pre-show">
-        <!--<h3>Hits Scored Against Your Fleet:</h3>
-        <p>Carrier: <span class="hit-score">0</span><span>/5</span></p>
-        <p>Battleship: <span class="hit-score">0</span><span>/4</span></p>
-        <p>Submarine: <span class="hit-score">0</span><span>/3</span></p>
-        <p>Destroyer: <span class="hit-score">0</span><span>/3</span></p>
-        <p>Patrol Boat: <span class="hit-score">0</span><span>/2</span></p>-->
-      </div>
+      </section>
+      <section id="current-player-grid"></section>
+      <section id="fleet-status" class="pre-show"></section>
       <dialog open id="landing-dialog">
         <div class="circle" id="circle">
           <header>
@@ -71,16 +64,16 @@
 
     <dialog id="your-turn-dialog">
       <div>
-        <div id="player-name"></div>
-        <div>IT'S</div>
-        <div>YOUR</div>
-        <div>TURN</div>
+        <h1 id="player-name"></h1>
+        <h1>IT'S</h1>
+        <h1>YOUR</h1>
+        <h1>TURN</h1>
         <button type="button">Let's go!</button>
       </div>
     </dialog>
     <dialog id="computer-sinks-your-boat">
       <div>
-        <div>The Computer has sunk your boat!</div>
+        <h1>The Computer has sunk your boat!</h1>
         <iframe
           src="https://giphy.com/embed/gjbIGLLbwULle"
           width="480"
@@ -96,7 +89,7 @@
     </dialog>
     <dialog id="computer-turn">
       <div>
-        <div id="computer-message"></div>
+        <h1 id="computer-message"></h1>
         <p>
           <img
             id="torpedo-gif"

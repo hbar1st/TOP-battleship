@@ -1,6 +1,8 @@
 import "./styles.css";
 import torpedoHit from "./torpedo-hits-ship.gif";
 import torpedoMisses from "./torpedo-misses-ship.gif";
+import explosion from "./explosion.mp3";
+import splash from "./splash.mp3";
 
 import {
   endGame,
@@ -179,6 +181,11 @@ function torpedo(e, gameboard, grid) {
     const xyPair = convertGridPairToCartesianPair(gameboard, row, col);
     const hitAShip = gameboard.receiveAttack(xyPair.x, xyPair.y);
     if (hitAShip) {
+      //play audio
+      new Audio(explosion).addEventListener("canplaythrough", (event) => {
+        /* the audio is now playable; play it if permissions allow */
+        event.target.play();
+      });
       //show fire emoji in that spot
       e.target.classList.add("hit");
       if (hitAShip.isSunk()) {
@@ -189,6 +196,11 @@ function torpedo(e, gameboard, grid) {
         shipEl.classList.remove("hidden");
       }
     } else {
+      //play audio
+      new Audio(splash).addEventListener("canplaythrough", (event) => {
+        /* the audio is now playable; play it if permissions allow */
+        event.target.play();
+      });
       //show water emoji in that spot
       e.target.classList.add("miss");
     }

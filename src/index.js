@@ -87,6 +87,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
 
   const playerGridInstructions = makePlayerGridDisplay(playerGrid);
 
+  addGridEl(playerGrid, currentPlayer);
   const playerGridTitle = `<h1>${currentPlayer.getName()}'s board</h1>`;
   /**
      *         
@@ -148,12 +149,13 @@ function makePlayerGridDisplay(parentEl) {
   instructionsEl.classList.add("instructions");
   parentEl.innerHTML = ""; //clear out the old elements
   parentEl.appendChild(instructionsEl);
-  addGridEl(parentEl);
   return instructionsEl;
 }
 
-function addGridEl(parentEl) {
-  const gridEl = document.createElement("div");
+function addGridEl(parentEl, player) {
+  // const gridEl = document.createElement("div");
+  const gridEl = document.createElement("section");
+  gridEl.setAttribute("aria-label", `${player.getName()}'s fleet board`);
   gridEl.classList.add("grid");
   parentEl.appendChild(gridEl);
   return gridEl;
@@ -310,6 +312,8 @@ function play(e, mainPlayer, oppPlayer) {
     }
   } else {
     const instructionsEl = makePlayerGridDisplay(parentEl);
+
+    addGridEl(parentEl, currentPlayer);
     //gridEl has to always be retrieved after the makePlayerGridDisplay!!! (breakable code!)
     const gridEl = document.querySelector("#current-player-grid .grid");
 
@@ -434,7 +438,9 @@ function displayTargetGrid(gridEl, oppPlayer) {
   for (let i = 0; i < gameboard.size + 1; i++) {
     const row = [];
     for (let j = 0; j < gameboard.size + 1; j++) {
-      const div = document.createElement("div");
+      //const div = document.createElement("div");
+      const div = document.createElement("input");
+      div.setAttribute("type", "button");
       if (i === gameboard.size && j !== 0) {
         div.innerText = rowLabel;
         div.classList.add("label");

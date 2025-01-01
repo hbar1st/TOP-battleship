@@ -357,7 +357,7 @@ input:hover {
   p {
     margin-top: 5px;
   }
-  input {
+  > .instructions input {
     width: 90%;
     padding: 2px 7px;
     letter-spacing: 1px;
@@ -383,7 +383,7 @@ div.label {
   align-items: center;
   border: 3px ridge gray;
 }
-div.grid {
+section.grid {
   width: fit-content;
   box-shadow: 1px 1px 1px 1px black;
   border-radius: 5px;

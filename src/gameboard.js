@@ -81,7 +81,12 @@ export class Gameboard {
   #addHit(x, y) {
     this.#hits.push({ x, y });
   }
-
+  /**
+   *
+   * @param {*} x
+   * @param {*} y
+   * @returns a Ship descendant object
+   */
   receiveAttack(x, y) {
     //is (x,y) a hit?, which ship was hit?
     let hit = false;

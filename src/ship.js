@@ -1,3 +1,9 @@
+import carrierAudio from "./carrier-destroyed.mp3";
+import patrolBoatAudio from "./patrol-boat-destroyed.mp3";
+import submarineAudio from "./submarine-destroyed.mp3";
+import destroyerAudio from "./destroyer-destroyed.mp3";
+import battleshipAudio from "./battleship-destroyed.mp3";
+
 export { Carrier, Battleship, Destroyer, Submarine, PatrolBoat, Ship };
 
 class Ship {
@@ -39,6 +45,10 @@ class Carrier extends Ship {
     super(5, "Carrier");
     this.id = "carrier";
   }
+
+  get audio() {
+    return carrierAudio;
+  }
 }
 
 class Battleship extends Ship {
@@ -47,6 +57,10 @@ class Battleship extends Ship {
   constructor() {
     super(4, "Battle Ship");
     this.id = "battleship";
+  }
+
+  get audio() {
+    return battleshipAudio;
   }
 }
 
@@ -57,6 +71,9 @@ class Destroyer extends Ship {
     super(3, "Destroyer");
     this.id = "destroyer";
   }
+  get audio() {
+    return destroyerAudio;
+  }
 }
 
 class Submarine extends Ship {
@@ -66,6 +83,10 @@ class Submarine extends Ship {
     super(3, "Submarine");
     this.id = "submarine";
   }
+
+  get audio() {
+    return submarineAudio;
+  }
 }
 
 class PatrolBoat extends Ship {
@@ -74,5 +95,9 @@ class PatrolBoat extends Ship {
   constructor() {
     super(2, "Patrol Boat");
     this.id = "patrol-boat";
+  }
+
+  get audio() {
+    return patrolBoatAudio;
   }
 }

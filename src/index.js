@@ -197,6 +197,17 @@ function torpedo(e, gameboard, grid) {
       e.target.classList.add("hit");
       e.target.value = "🔥";
       if (hitAShip.isSunk()) {
+        //play audio
+        setTimeout(() => {
+          new Audio(hitAShip.audio).addEventListener(
+            "canplaythrough",
+            (event) => {
+              /* the audio is now playable; play it if permissions allow */
+              event.target.play();
+            }
+          );
+        }, 1500);
+
         const shipEl = document.querySelector(
           `#current-player-grid .${hitAShip.id}`
         );

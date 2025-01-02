@@ -286,7 +286,6 @@ fieldset {
   }
 
   #label:focus-within ~ #opp-name {
-
   }
   label:has(> #another-human:checked) ~ #opp-name {
     border: 3px solid rgb(135, 225, 135);
@@ -402,11 +401,12 @@ section.grid {
   justify-content: center;
   align-items: center;
 }
-/*
+
 .cell.hit::before {
   content: "🔥";
   z-index: 4;
 }
+/*
 .cell.miss::before {
   content: "💧";
   background-color: #c1f0ff;

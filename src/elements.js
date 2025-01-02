@@ -18,6 +18,7 @@ function showElement(el, timeout = 0) {
     el.classList.remove("pre-show");
     el.classList.remove("hide");
     el.classList.add("show");
+    el.removeAttribute("aria-hidden");
   }, timeout);
 }
 
@@ -29,7 +30,9 @@ function staggeredShowElement(elList) {
 
 function makeShipEl(shipSpot, currentPlayer, unresponsive) {
   const gameboard = currentPlayer.getBoard();
-  const div = document.createElement("div");
+  //const div = document.createElement("div");
+  const div = document.createElement("input");
+  div.setAttribute("type", "button");
   div.classList.add("ship", shipSpot.ship.id);
   div.setAttribute("id", shipSpot.ship.id);
   if (!unresponsive) {
@@ -135,7 +138,6 @@ function shiftMode(e, currentPlayer) {
 }
 
 function rotateShip(e, currentPlayer) {
-
   const shipEl = e.target.parentElement;
   const dir = shipEl.getAttribute("data-dir");
   const x1 = Number(shipEl.getAttribute("data-x1"));
@@ -166,6 +168,7 @@ function endGame(winner, loser) {
     const winnerName = document.querySelector("#winner-name");
     const playbutton = document.querySelector("#play-again");
     const hidebutton = document.querySelector("#hide-pane");
+    playbutton.focus();
     playbutton.addEventListener("click", () => {
       location.reload();
     });

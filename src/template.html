@@ -7,7 +7,7 @@
   </head>
   <body>
     <main>
-      <section id="end-game">
+      <section id="end-game" >
         <div>
           <h1>Congratulations <span id="winner-name"></span>, you won!</h1>
           <button type="button" id="play-again">Play Again!</button>
@@ -24,6 +24,7 @@
           <form action="" method="post">
             <fieldset>
               <legend><h2>Who do you want to play against?</h2></legend>
+              <div>
               <label for="another-human"
                 ><input
                   type="radio"
@@ -31,6 +32,7 @@
                   required
                   id="another-human"
                 />Another human:
+                </label>
                 <input
                   type="text"
                   name="opponent-name"
@@ -38,6 +40,7 @@
                   placeholder="type name"
                 />
               </label>
+            </div>
               <label
                 ><input
                   type="radio"

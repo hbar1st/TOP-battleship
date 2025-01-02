@@ -18,6 +18,7 @@ function showElement(el, timeout = 0) {
     el.classList.remove("pre-show");
     el.classList.remove("hide");
     el.classList.add("show");
+    el.removeAttribute("aria-hidden");
   }, timeout);
 }
 
@@ -167,6 +168,7 @@ function endGame(winner, loser) {
     const winnerName = document.querySelector("#winner-name");
     const playbutton = document.querySelector("#play-again");
     const hidebutton = document.querySelector("#hide-pane");
+    playbutton.focus();
     playbutton.addEventListener("click", () => {
       location.reload();
     });

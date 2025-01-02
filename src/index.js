@@ -20,8 +20,6 @@ import {
 
 import { Gameboard } from "./gameboard.js";
 
-const landingDialog = document.querySelector("#landing-dialog");
-const form = document.querySelector("form");
 const mainPlayerName = document.querySelector("#main-player");
 const opponentName = document.querySelector("#opp-name");
 
@@ -52,6 +50,8 @@ submitBtn.addEventListener("click", (event) => {
   } else {
     mainPlayerName.setCustomValidity("");
   }
+
+  const form = document.querySelector("form");
   const opponentChoices = form.elements.namedItem("opponent");
   //check which opponent was selected and if form is valid
   let checkedId = 0;
@@ -123,6 +123,7 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
         () => {
           playerGrid.classList.remove("show", "pre-show");
           playerGrid.classList.add("hide");
+          playerGrid.setAttribute("aria-hidden", "true");
           setTimeout(() => {
             setupPlayerShips(opponentPlayer, mainPlayer, opponentPlayer);
           }, 500);
@@ -138,15 +139,21 @@ function setupPlayerShips(currentPlayer, mainPlayer, opponentPlayer) {
   playerGridInstructions.innerHTML += playerGridLockParagraph;
   playerGridInstructions.appendChild(playerGridLockButton);
   playerGrid.classList.add("pre-show"); //scales the element to hide it
+  playerGrid.setAttribute("aria-hidden", "true");
   const gridEl = document.querySelector("#current-player-grid .grid");
   displayShipsGrid(gridEl, currentPlayer);
+
+  const landingDialog = document.querySelector("#landing-dialog");
   landingDialog.classList.add("hide");
+  landingDialog.setAttribute("aria-hidden", "true");
+  disable(landingDialog);
   showElement(playerGrid);
 }
 
 function makePlayerGridDisplay(parentEl) {
   parentEl.classList.add("pre-show");
   parentEl.classList.remove("show", "hide");
+  parentEl.removeAttribute("aria-hidden");
   const instructionsEl = document.createElement("p");
   instructionsEl.classList.add("instructions");
   parentEl.innerHTML = ""; //clear out the old elements
@@ -188,12 +195,14 @@ function torpedo(e, gameboard, grid) {
       });
       //show fire emoji in that spot
       e.target.classList.add("hit");
+      e.target.value = "🔥";
       if (hitAShip.isSunk()) {
         const shipEl = document.querySelector(
           `#current-player-grid .${hitAShip.id}`
         );
         shipEl.classList.add("sunk");
         shipEl.classList.remove("hidden");
+        shipEl.removeAttribute("aria-hidden");
       }
     } else {
       //play audio
@@ -201,6 +210,7 @@ function torpedo(e, gameboard, grid) {
         /* the audio is now playable; play it if permissions allow */
         event.target.play();
       });
+      e.target.value = "💧";
       //show water emoji in that spot
       e.target.classList.add("miss");
     }
@@ -209,6 +219,8 @@ function torpedo(e, gameboard, grid) {
       const nextBtn = document.querySelector(".instructions>input");
 
       nextBtn.classList.remove("hide");
+      nextBtn.removeAttribute("disabled");
+      nextBtn.removeAttribute("aria-hidden");
       nextBtn.classList.add("show");
     }
     return true;
@@ -217,6 +229,12 @@ function torpedo(e, gameboard, grid) {
   }
 }
 
+function disable(el) {
+  el.setAttribute("disabled", "true");
+  for (const c of el.children) {
+    disable(c);
+  }
+}
 function play(e, mainPlayer, oppPlayer) {
   const parentEl = document.querySelector("#current-player-grid");
   const abortController = new AbortController();
@@ -240,8 +258,10 @@ function play(e, mainPlayer, oppPlayer) {
         : mainPlayer.getBoard();
 
     const parentEl = document.querySelector("#current-player-grid");
+
     if (torpedo(e, targetBoard, parentEl)) {
       if (targetBoard.allShipsSunk()) {
+        disable(parentEl);
         endGame(currentPlayer, oppPlayer);
       }
       abortController.abort();
@@ -258,7 +278,9 @@ function play(e, mainPlayer, oppPlayer) {
     parentEl.classList.remove("show");
     fleetStatusEl.classList.remove("show");
     parentEl.classList.add("hide");
+    parentEl.setAttribute("aria-hidden", "true");
     fleetStatusEl.classList.add("hide");
+    fleetStatusEl.setAttribute("aria-hidden", "true");
 
     // during computer's turn, computer must try to throw a torpedo
     // TODO add some intelligence to the choices the computer makes
@@ -334,18 +356,26 @@ function play(e, mainPlayer, oppPlayer) {
       e.target.id !== "opp-player-turn"
     ) {
       parentEl.classList.add("pre-show"); //scales the element to hide it
+      parentEl.setAttribute("aria-hidden", "true");
       gridEl.addEventListener("click", throwATorpedo, abortController); //send opponent's board to be targeted
       showElement(parentEl);
       fleetStatusEl.classList.add("pre-show");
+      fleetStatusEl.setAttribute("aria-hidden", "true");
       fleetStatusEl.innerHTML = ""; //clear out the old elements
       fleetStatusEl.innerHTML = "<h3>Your Fleet Status</h3>";
-      displayShipsGrid(addGridEl(fleetStatusEl), currentPlayer, true);
+      displayShipsGrid(
+        addGridEl(fleetStatusEl, currentPlayer),
+        currentPlayer,
+        true
+      );
       showElement(fleetStatusEl);
     } else {
       parentEl.classList.remove("show");
       fleetStatusEl.classList.remove("show");
       parentEl.classList.add("hide");
+      parentEl.setAttribute("aria-hidden", "true");
       fleetStatusEl.classList.add("hide");
+      fleetStatusEl.setAttribute("aria-hidden", "true");
     }
 
     if (
@@ -384,6 +414,8 @@ function play(e, mainPlayer, oppPlayer) {
       instructionsEl.innerHTML = playerInstructions;
       if (nextButton) {
         nextButton.classList.add("hide");
+        nextButton.setAttribute("disabled", "true");
+        nextButton.setAttribute("aria-hidden", "true");
         nextButton.classList.remove("show", "pre-show");
         instructionsEl.appendChild(nextButton);
       }
@@ -441,12 +473,15 @@ function displayTargetGrid(gridEl, oppPlayer) {
     if (shipSpot.ship.isSunk()) {
       div.classList.add("sunk");
       div.classList.remove("hidden");
+      div.removeAttribute("aria-hidden");
     } else {
       div.classList.add("hidden");
+      div.setAttribute("aria-hidden", "true");
     }
     gridEl.appendChild(div);
   });
 
+  let revRowLabel = "A".charCodeAt(0);
   for (let i = 0; i < gameboard.size + 1; i++) {
     const row = [];
     for (let j = 0; j < gameboard.size + 1; j++) {
@@ -454,23 +489,32 @@ function displayTargetGrid(gridEl, oppPlayer) {
       const div = document.createElement("input");
       div.setAttribute("type", "button");
       if (i === gameboard.size && j !== 0) {
-        div.innerText = rowLabel;
+        div.value = rowLabel;
         div.classList.add("label");
+        div.setAttribute("disabled", true);
+        div.setAttribute("aria-label", "target column");
         rowLabel++;
       }
       if (j === 0 && i < gameboard.size) {
-        div.innerText = String.fromCharCode(colLabel);
+        div.value = String.fromCharCode(colLabel);
         div.classList.add("label");
+        div.setAttribute("disabled", true);
+        div.setAttribute("aria-label", "target row");
         colLabel++;
       }
       if (j === 0 && i === gameboard.size) {
         div.classList.add("label");
+        div.setAttribute("disabled", true);
+        div.setAttribute("aria-hidden", "true"); //corner square should not be played
       }
       if (!div.classList.contains("label")) {
         div.classList.add("cell");
       }
+
       row.push(div);
     }
+
+    revRowLabel++;
     gridArr.push(row);
   }
   let mirrorboard = [];
@@ -497,9 +541,20 @@ function displayTargetGrid(gridEl, oppPlayer) {
 
         if (missedPair.length) {
           mirrorboard[i][j].classList.add("miss");
+          mirrorboard[i][j].value = "💧";
         } else if (hitsPair.length) {
           mirrorboard[i][j].classList.add("hit");
+          mirrorboard[i][j].value = "🔥";
         }
+        const type = mirrorboard[i][j].classList.contains("hit")
+          ? "hit"
+          : mirrorboard[i][j].classList.contains("miss")
+          ? "miss"
+          : "cell";
+        mirrorboard[i][j].setAttribute(
+          "aria-label",
+          `${type} (${j - 1},${String.fromCharCode(revRowLabel)})`
+        );
       }
       gridEl.appendChild(mirrorboard[i][j]);
     }
